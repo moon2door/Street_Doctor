@@ -9,9 +9,11 @@ public class Right_handmoving : MonoBehaviour
     Ray ray;
     RaycastHit hit;
 
-    public Transform playerRoot;         // 회전의 중심 (PlayerRoot 또는 OVRCameraRig 부모)
-    public float rotationSpeed = 45f;    // 초당 회전 속도 (도 단위)
-    //Start is called before the first frame update
+    public Transform playerRoot;
+    public float rotationSpeed = 45f;
+
+    private GameObject grabbedObject = null;
+
     void Start()
     {
         myLR = GetComponent<LineRenderer>();
@@ -22,62 +24,46 @@ public class Right_handmoving : MonoBehaviour
         transform.parent = right_hand.transform;
     }
 
-    //Update is called once per frame
     void Update()
     {
-        Vector2 input = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick); // 오른손 썸스틱
-
-        if (Mathf.Abs(input.x) > 0.2f) // 좌우 입력 감지 (Deadzone 설정)
+        // 회전
+        Vector2 input = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
+        if (Mathf.Abs(input.x) > 0.2f)
         {
             float rotationAmount = input.x * rotationSpeed * Time.deltaTime;
             playerRoot.Rotate(Vector3.up, rotationAmount);
         }
+
+        // 레이캐스트
         ray.origin = right_hand.transform.position;
         ray.direction = right_hand.transform.forward;
         myLR.SetPosition(0, ray.origin);
-        myLR.SetPosition(1, ray.origin + ray.direction * 5);
+        myLR.SetPosition(1, ray.origin + ray.direction * 3);
 
-        if (Physics.Raycast(ray, out hit, 5f))
+        if (Physics.Raycast(ray, out hit, 3f))
         {
             myLR.startColor = Color.green;
             myLR.endColor = Color.green;
             myLR.SetPosition(1, hit.point);
 
-            //  인덱스트리거: 상호작용 (예: 문열기)
+            // 문 상호작용
             if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch))
             {
                 Debug.Log("상호작용 시도: " + hit.collider.gameObject.name);
                 DoorInteraction door = hit.collider.gameObject.GetComponentInParent<DoorInteraction>();
-                if (door != null)
-                {
-                    door.OnInteract();
-                }
-                else
-                {
-                    Debug.Log("문 오브젝트에서 DoorInteraction 스크립트를 찾을 수 없음");
-                }
-            }
-            //  핸드트리거: 잡기
-            if (OVRInput.GetDown(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.RTouch))
-            {
-                if (hit.collider != null)
-                {
-                    hit.collider.gameObject.transform.position = right_hand.transform.position + ray.direction * 0.1f;
-                    hit.collider.gameObject.transform.parent = right_hand.transform;
-                    hit.collider.gameObject.transform.eulerAngles = Vector3.zero;
-                }
+                if (door != null) door.OnInteract();
+                else Debug.Log("문 오브젝트에서 DoorInteraction 스크립트를 찾을 수 없음");
             }
 
-            //  핸드트리거 해제: 놓기
-            if (OVRInput.GetUp(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.RTouch))
+            // 오브젝트 잡기
+            if (OVRInput.GetDown(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.RTouch))
             {
-                if (hit.collider != null)
+                if (hit.collider != null && hit.collider.GetComponent<GrabObject>() != null)
                 {
-                    hit.collider.gameObject.transform.parent = null;
-                    GameObject location = GameObject.Find(hit.collider.gameObject.name + "_");
-                    hit.collider.gameObject.transform.eulerAngles = Vector3.zero;
-                    hit.collider.gameObject.transform.parent = location.transform;
-                    hit.collider.gameObject.transform.localPosition = Vector3.zero;
+                    grabbedObject = hit.collider.gameObject;
+                    grabbedObject.transform.position = right_hand.transform.position + ray.direction * 0.1f;
+                    grabbedObject.transform.parent = right_hand.transform;
+                    grabbedObject.transform.eulerAngles = Vector3.zero;
                 }
             }
         }
@@ -85,6 +71,23 @@ public class Right_handmoving : MonoBehaviour
         {
             myLR.startColor = Color.red;
             myLR.endColor = Color.red;
+        }
+
+        // 오브젝트 놓기
+        if (OVRInput.GetUp(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.RTouch))
+        {
+            if (grabbedObject != null)
+            {
+                grabbedObject.transform.parent = null;
+                GameObject location = GameObject.Find(grabbedObject.name + "_");
+                if (location != null)
+                {
+                    grabbedObject.transform.eulerAngles = Vector3.zero;
+                    grabbedObject.transform.parent = location.transform;
+                    grabbedObject.transform.localPosition = Vector3.zero;
+                }
+                grabbedObject = null;
+            }
         }
     }
 }
