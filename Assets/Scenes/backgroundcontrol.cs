@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class backgroundcontrol : MonoBehaviour
 {
     public Image fadeImage;
-    public float fadeDuration = 82f;
+    public float fadeDuration = 5f;
 
     private void Start()
     {
