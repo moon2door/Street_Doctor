@@ -26,7 +26,7 @@ public class Right_handmoving : MonoBehaviour
 
     void Update()
     {
-        // 오른쪽 썸스틱으로 화면회전
+        // 오른쪽 썸스틱으로 플레이어 시야 회전
         Vector2 input = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
         if (Mathf.Abs(input.x) > 0.2f)
         {
@@ -34,12 +34,13 @@ public class Right_handmoving : MonoBehaviour
             playerRoot.Rotate(Vector3.up, rotationAmount);
         }
 
-        // 레이캐스트
+        // 오른손에서 레이 발사
         ray.origin = right_hand.transform.position;
         ray.direction = right_hand.transform.forward;
         myLR.SetPosition(0, ray.origin);
         myLR.SetPosition(1, ray.origin + ray.direction * 3);
 
+        // 오른손에서발사한  레이케스트에 맞은 오브젝트가 있을때
         if (Physics.Raycast(ray, out hit, 3f))
         {
             myLR.startColor = Color.green;
@@ -66,20 +67,34 @@ public class Right_handmoving : MonoBehaviour
                     grabbedObject.transform.eulerAngles = Vector3.zero;
                 }
             }
+            // 잡고 있는 오브젝트가 붙이기 가능한 위치에 닿았고, 인덱스트리거를 눌렀을 때
+            if (grabbedObject != null && OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch))
+            {
+                if (hit.collider != null && hit.collider.GetComponent<AttachableSpot>() != null)
+                {
+                    Debug.Log("붙이기 위치 감지됨: " + hit.collider.gameObject.name);
+
+                    grabbedObject.transform.parent = hit.collider.transform;
+                    grabbedObject.transform.localPosition = Vector3.zero;
+                    grabbedObject.transform.localRotation = Quaternion.identity;
+
+                    grabbedObject = null; // 손에서 해제
+                }
+            }
         }
-        else
+        else  // 레이캐스트 실패 시 빨간색 라인
         {
             myLR.startColor = Color.red;
             myLR.endColor = Color.red;
         }
 
-        // 오브젝트 놓기
+        // 핸드트리거를 뗐을때 오브젝트 놓기(제자리 복귀)
         if (OVRInput.GetUp(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.RTouch))
         {
             if (grabbedObject != null)
             {
                 grabbedObject.transform.parent = null;
-                GameObject location = GameObject.Find(grabbedObject.name + "_");
+                GameObject location = GameObject.Find(grabbedObject.name + "_");// 잡은 오브젝트 이름 + "_" 형식의 복귀 위치 탐색
                 if (location != null)
                 {
                     grabbedObject.transform.eulerAngles = Vector3.zero;

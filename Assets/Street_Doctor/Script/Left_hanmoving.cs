@@ -34,12 +34,13 @@ public class Left_handmoving : MonoBehaviour
         if (playerRoot != null)
             playerRoot.position += moveDir * moveSpeed * Time.deltaTime;
 
-        // 레이캐스트
+        // 왼손에서 레이 발사
         ray.origin = left_hand.transform.position;
         ray.direction = left_hand.transform.forward;
         myLR.SetPosition(0, ray.origin);
         myLR.SetPosition(1, ray.origin + ray.direction * 3);
 
+        // 왼손에서 발사된 레이케스트 충돌시
         if (Physics.Raycast(ray, out hit, 3f))
         {
             myLR.startColor = Color.green;
@@ -66,20 +67,34 @@ public class Left_handmoving : MonoBehaviour
                     grabbedObject.transform.eulerAngles = Vector3.zero;
                 }
             }
+            // 잡은 오브젝트가 붙이기 가능한 위치에 닿았고, 인덱스트리거를 누른 경우
+            if (grabbedObject != null && OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.LTouch))
+            {
+                if (hit.collider != null && hit.collider.GetComponent<AttachableSpot>() != null)
+                {
+                    Debug.Log("붙이기 위치 감지됨: " + hit.collider.gameObject.name);
+
+                    grabbedObject.transform.parent = hit.collider.transform;
+                    grabbedObject.transform.localPosition = Vector3.zero;
+                    grabbedObject.transform.localRotation = Quaternion.identity;
+
+                    grabbedObject = null; // 손에서 놓기
+                }
+            }
         }
-        else
+        else // 레이 충돌 없음: 빨간색 라인
         {
             myLR.startColor = Color.red;
             myLR.endColor = Color.red;
         }
 
-        // 오브젝트 놓기
+        // 핸드트리거를 뗐을 때 오브젝트 놓기(제자리 복귀)
         if (OVRInput.GetUp(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.LTouch))
         {
             if (grabbedObject != null)
             {
                 grabbedObject.transform.parent = null;
-                GameObject location = GameObject.Find(grabbedObject.name + "_");
+                GameObject location = GameObject.Find(grabbedObject.name + "_"); // "오브젝트이름_" 형태의 기준 위치 찾기
                 if (location != null)
                 {
                     grabbedObject.transform.eulerAngles = Vector3.zero;
