@@ -7,7 +7,7 @@ public class AlignmentManager : MonoBehaviour
     public GameObject rightHand;
     public GameObject leftHand;
     public GameObject headset;
-    public GameObject targetObject;
+    //public GameObject targetObject;
 
     private bool isAligned = false;
 
@@ -27,7 +27,7 @@ public class AlignmentManager : MonoBehaviour
             if (!isAligned)
             {
                 Debug.Log(" 손과 머리가 세로 일직선입니다. 진동 시작");
-                StartCoroutine(VibrateBothHands(2f)); // 진동 2초
+                StartCoroutine(VibrateBothHands(0.1f)); // 진동 0.1초
                 isAligned = true;
             }
         }
