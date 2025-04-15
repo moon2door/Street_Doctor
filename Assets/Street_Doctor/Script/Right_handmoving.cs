@@ -9,8 +9,8 @@ public class Right_handmoving : MonoBehaviour
     Ray ray;
     RaycastHit hit;
 
-    public Transform playerRoot;
-    public float rotationSpeed = 45f;
+    public Transform playerRoot; // 플레이어 전체를 감싸는 루트(머리 기준)
+    public float rotationSpeed = 45f; //playerRoot 의 시야 회전 속도 
 
     private GameObject grabbedObject = null;
 
@@ -26,7 +26,7 @@ public class Right_handmoving : MonoBehaviour
 
     void Update()
     {
-        // 회전
+        // 오른쪽 썸스틱으로 화면회전
         Vector2 input = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
         if (Mathf.Abs(input.x) > 0.2f)
         {
@@ -46,7 +46,7 @@ public class Right_handmoving : MonoBehaviour
             myLR.endColor = Color.green;
             myLR.SetPosition(1, hit.point);
 
-            // 문 상호작용
+            // 인덱스 트리거 : 문 상호작용
             if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch))
             {
                 Debug.Log("상호작용 시도: " + hit.collider.gameObject.name);
@@ -55,7 +55,7 @@ public class Right_handmoving : MonoBehaviour
                 else Debug.Log("문 오브젝트에서 DoorInteraction 스크립트를 찾을 수 없음");
             }
 
-            // 오브젝트 잡기
+            // 핸드트리거 : 오브젝트 잡기
             if (OVRInput.GetDown(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.RTouch))
             {
                 if (hit.collider != null && hit.collider.GetComponent<GrabObject>() != null)

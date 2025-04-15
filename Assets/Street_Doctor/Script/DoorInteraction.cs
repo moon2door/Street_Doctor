@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DoorInteraction : MonoBehaviour
+public class DoorInteraction : MonoBehaviour //Door_parent에 들어있는 스크립트. 힌지 역할을 한다.
 {
     public bool isOpen = false;
-    public float openAngle = 90f;
-    public float openSpeed = 2f;
+    public float openAngle = 90f; //문 열림 각도
+    public float openSpeed = 2f;  //문 열림 속도
 
     private Quaternion closedRotation;
     private Quaternion openedRotation;

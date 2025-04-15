@@ -72,7 +72,7 @@ public class CPRRecognizer : MonoBehaviour
         }
     }
 
-    private IEnumerator TriggerVibration()
+    private IEnumerator TriggerVibration()//진동 시작
     {
         while (true)
         {
@@ -82,7 +82,7 @@ public class CPRRecognizer : MonoBehaviour
         }
     }
 
-    private void StopVibration()
+    private void StopVibration()//진동 멈춤
     {
         if (vibrationCoroutine != null)
         {

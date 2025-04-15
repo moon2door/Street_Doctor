@@ -46,7 +46,7 @@ public class Left_handmoving : MonoBehaviour
             myLR.endColor = Color.green;
             myLR.SetPosition(1, hit.point);
 
-            // 문 상호작용
+            // 인덱스 트리거 : 문 상호작용
             if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.LTouch))
             {
                 Debug.Log("상호작용 시도: " + hit.collider.gameObject.name);
@@ -55,7 +55,7 @@ public class Left_handmoving : MonoBehaviour
                 else Debug.Log("문 오브젝트에서 DoorInteraction 스크립트를 찾을 수 없음");
             }
 
-            //  핸드트리거: 잡기
+            //  핸드트리거: 오브젝트 잡기
             if (OVRInput.GetDown(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.LTouch))
             {
                 if (hit.collider != null && hit.collider.GetComponent<GrabObject>() != null)
