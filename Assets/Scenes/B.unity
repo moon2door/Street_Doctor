@@ -494,7 +494,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeImage: {fileID: 1088263398}
-  delay: 10
+  delay: 8
   fadeDuration: 2
 --- !u!114 &1088263398
 MonoBehaviour:

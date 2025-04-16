@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 public class Tothelastscene : MonoBehaviour
 {
     public Image[] images;
-    public float delay = 3f;
+    public float delay = 2f;
 
     // Start is called before the first frame update
     void Start()
@@ -20,7 +20,7 @@ public class Tothelastscene : MonoBehaviour
         }
 
         StartCoroutine(StartSequence());
-        StartCoroutine(sceneupload(15f));
+        StartCoroutine(sceneupload(10f));
 
     }
 

@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb54b9087bb2bfa49a1ef9e80ae07da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeImage: {fileID: 0}
+  fadeImage: {fileID: 1620300505}
   fadeDuration: 4
   delayBeforeSceneChange: 7
 --- !u!65 &576252332
