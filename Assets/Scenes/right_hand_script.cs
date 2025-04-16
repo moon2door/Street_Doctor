@@ -1,11 +1,13 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class righthand : MonoBehaviour
+public class right_hand_script : MonoBehaviour
 {
-    GameObject rightHand;
+
+    GameObject righthand;
     public Image fadeImage;
     public float fadeDuration = 4f;
     public float delayBeforeSceneChange = 7f;
@@ -16,9 +18,9 @@ public class righthand : MonoBehaviour
 
     void Start()
     {
-        rightHand = GameObject.Find("RightHandAnchor");
-        transform.position = rightHand.transform.position;
-        transform.parent = rightHand.transform;
+        righthand = GameObject.Find("RightHandAnchor");
+        transform.position = righthand.transform.position;
+        transform.parent = righthand.transform;
 
         if (fadeImage != null)
         {
@@ -62,3 +64,4 @@ public class righthand : MonoBehaviour
         SceneManager.LoadScene("B");
     }
 }
+
