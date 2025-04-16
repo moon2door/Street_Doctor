@@ -16,7 +16,7 @@ public class LoadingSceneController : MonoBehaviour
 
     IEnumerator LoadCScene()
     {
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("C_Scene_2", LoadSceneMode.Additive);
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("C_Scene", LoadSceneMode.Additive);
         asyncLoad.allowSceneActivation = false;
 
         while (asyncLoad.progress < 0.9f)
