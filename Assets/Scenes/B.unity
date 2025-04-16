@@ -495,7 +495,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fadeImage: {fileID: 1088263398}
   delay: 8
-  fadeDuration: 2
+  fadeDuration: 3
 --- !u!114 &1088263398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -717,7 +717,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeImage: {fileID: 1652323430}
-  fadeDuration: 5
+  fadeDuration: 6
 --- !u!114 &1652323430
 MonoBehaviour:
   m_ObjectHideFlags: 0

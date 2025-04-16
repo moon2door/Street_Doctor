@@ -6,7 +6,7 @@ public class gotonextscene : MonoBehaviour
 {
     public Image fadeImage;          // 검정색 UI 이미지 연결
     public float delay = 8f;        // 몇 초 후에 페이드 시작할지
-    public float fadeDuration = 2f;  // 페이드 되는 시간
+    public float fadeDuration = 3f;  // 페이드 되는 시간
 
     void Start()
     {
