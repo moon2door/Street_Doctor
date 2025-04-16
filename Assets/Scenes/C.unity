@@ -839,7 +839,7 @@ MonoBehaviour:
   - {fileID: 1992421698}
   - {fileID: 1223075776}
   - {fileID: 1782079201}
-  delay: 2.4
+  delay: 2
 --- !u!114 &1576213953
 MonoBehaviour:
   m_ObjectHideFlags: 0
