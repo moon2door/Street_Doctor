@@ -8,14 +8,25 @@ public class LoadingSceneController : MonoBehaviour
 {
     public Slider loadingBar;
     public CanvasGroup loadingCanvasGroup; // 페이드 아웃용
+    public GameManager gameManager;
 
     void Start()
     {
+        GameObject gmObj = GameObject.Find("GameManager");
+        if (gmObj != null)
+        {
+            gameManager = gmObj.GetComponent<GameManager>();
+        }
+
         StartCoroutine(LoadCScene());
     }
 
     IEnumerator LoadCScene()
     {
+        StartCoroutine(gameManager.FadeReturn());
+
+        yield return new WaitForSeconds(1f);
+
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("C_Scene", LoadSceneMode.Additive);
         asyncLoad.allowSceneActivation = false;
 
@@ -29,6 +40,7 @@ public class LoadingSceneController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         asyncLoad.allowSceneActivation = true;
+
 
         // 로딩 완료 후 페이드 아웃
         yield return StartCoroutine(FadeOutLoadingUI());

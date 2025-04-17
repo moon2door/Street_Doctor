@@ -9,6 +9,8 @@ public class TimerManager : MonoBehaviour
     private float timer = 0f;           // 현재 시간
     public bool isTimeUp = false;       // 타이머 종료 여부
 
+    private bool isStopped = false;   // 타이머 정지 여부
+
     // 전체 시간을 초 단위로 반환하는 프로퍼티
     public float TotalTimeInSeconds => playTimeMinutes * 60f;
 
@@ -22,6 +24,7 @@ public class TimerManager : MonoBehaviour
     {
         // 만약 시간이 끝나있다면 더이상 실행 x
         if (isTimeUp) return;
+        if (isStopped) return;
 
         // 매 프레임 시간 감소
         timer -= Time.deltaTime;
@@ -37,6 +40,11 @@ public class TimerManager : MonoBehaviour
         }
     }
 
+    public void StopTimer()
+    {
+        isStopped = true;
+    }
+
     public bool IsTimeUp()
     {
         // 이 메서드가 실행되면 isTimeUp 값 반환
@@ -48,5 +56,6 @@ public class TimerManager : MonoBehaviour
         // 이 메서드가 실행되면 타이머리셋 후 타임 업 값 = false
         timer = TotalTimeInSeconds;
         isTimeUp = false;
+        isStopped = false;
     }
 }

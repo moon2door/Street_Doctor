@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -46,7 +47,7 @@ public class RH : MonoBehaviour
 
         if (OVRInput.GetDown(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.RTouch))
         {
-            SceneManager.LoadScene("B_Scene_Loading"); // B ¾À (·Îµù ¾À)À¸·Î ÀÌµ¿
+            StartCoroutine(ChangeScene());
         }
     }
 
@@ -73,5 +74,12 @@ public class RH : MonoBehaviour
                     gaugeManager.gaugeSlider = sliderObj.GetComponent<Slider>();
             }
         }
+    }
+
+    IEnumerator ChangeScene()
+    {
+        yield return StartCoroutine(gameManager.FadeToBlack());
+
+        SceneManager.LoadScene("B_Scene_Loading"); // B ¾À (·Îµù ¾À)À¸·Î ÀÌµ¿
     }
 }

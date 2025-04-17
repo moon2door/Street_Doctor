@@ -165,7 +165,7 @@ GameObject:
   - component: {fileID: 164232395}
   - component: {fileID: 164232394}
   m_Layer: 5
-  m_Name: FadeOut
+  m_Name: FadeOut_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -593,13 +593,7 @@ MonoBehaviour:
   ambulance: {fileID: 0}
   pointB: {fileID: 0}
   pointC: {fileID: 0}
-  fadeImages:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  fadeImage: {fileID: 164232394}
 --- !u!4 &676549407
 Transform:
   m_ObjectHideFlags: 0
@@ -1054,6 +1048,7 @@ GameObject:
   - component: {fileID: 1129439856}
   - component: {fileID: 1129439855}
   - component: {fileID: 1129439854}
+  - component: {fileID: 1129439858}
   m_Layer: 5
   m_Name: FadeOut
   m_TagString: Untagged
@@ -1144,6 +1139,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1129439858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1129439853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 378136aa6ddbdc445b55b90a888b792b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1167783092
 GameObject:
   m_ObjectHideFlags: 0
