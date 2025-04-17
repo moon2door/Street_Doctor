@@ -13,22 +13,32 @@ public class Right_handmoving : MonoBehaviour
     public float rotationSpeed = 45f; //playerRoot 의 시야 회전 속도 
 
     private GameObject grabbedObject = null;
+    private bool isInitialized = false;
 
     void Start()
     {
         myLR = GetComponent<LineRenderer>();
         right_hand = GameObject.Find("RightHandAnchor");
 
+        if (right_hand == null)
+        {
+            Debug.LogWarning("[Right_handmoving] RightHandAnchor가 씬에 없습니다. 이 스크립트는 비활성화됩니다.");
+            enabled = false;
+            return;
+        }
         transform.position = right_hand.transform.position;
         transform.eulerAngles = right_hand.transform.eulerAngles;
         transform.parent = right_hand.transform;
+
+        isInitialized = true;
     }
 
     void Update()
     {
         // 오른쪽 썸스틱으로 플레이어 시야 회전
         Vector2 input = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
-        if (Mathf.Abs(input.x) > 0.2f)
+        
+        if (Mathf.Abs(input.x) > 0.5f)
         {
             float rotationAmount = input.x * rotationSpeed * Time.deltaTime;
             playerRoot.Rotate(Vector3.up, rotationAmount);
@@ -70,15 +80,18 @@ public class Right_handmoving : MonoBehaviour
             // 잡고 있는 오브젝트가 붙이기 가능한 위치에 닿았고, 인덱스트리거를 눌렀을 때
             if (grabbedObject != null && OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch))
             {
-                if (hit.collider != null && hit.collider.GetComponent<AttachableSpot>() != null)
+                if (hit.collider != null && hit.collider.GetComponent<AttachableSpot>() is AttachableSpot spot && spot.snapTransform != null)
                 {
                     Debug.Log("붙이기 위치 감지됨: " + hit.collider.gameObject.name);
 
-                    grabbedObject.transform.parent = hit.collider.transform;
-                    grabbedObject.transform.localPosition = Vector3.zero;
-                    grabbedObject.transform.localRotation = Quaternion.identity;
+                    // 스냅 포지션 & 회전 적용
+                    grabbedObject.transform.position = spot.snapTransform.position;
+                    grabbedObject.transform.rotation = spot.snapTransform.rotation;
+                    // 부모 설정 (붙이기 효과)
+                    grabbedObject.transform.parent = spot.snapTransform;
 
-                    grabbedObject = null; // 손에서 해제
+                    StartCoroutine(ShortVibration(0.1f));//진동 세기
+                    grabbedObject = null; // 손에서 해제                    
                 }
             }
         }
@@ -104,5 +117,14 @@ public class Right_handmoving : MonoBehaviour
                 grabbedObject = null;
             }
         }
+    }
+    IEnumerator ShortVibration(float duration)
+    {
+        // 진동 시작: 강도 0.5, 주파수 0.5
+        OVRInput.SetControllerVibration(0.5f, 0.5f, OVRInput.Controller.RTouch);
+        // duration 초 기다림
+        yield return new WaitForSeconds(duration);
+        // 진동 정지
+        OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.RTouch);
     }
 }

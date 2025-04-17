@@ -32,7 +32,26 @@ public class Left_handmoving : MonoBehaviour
         moveDir.y = 0f; // 수직 이동 방지
 
         if (playerRoot != null)
-            playerRoot.position += moveDir * moveSpeed * Time.deltaTime;
+        {
+            Rigidbody rb = playerRoot.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                if (input.sqrMagnitude > 0.01f)
+                {
+                    // 입력이 있을 때만 이동
+                    rb.MovePosition(rb.position + moveDir * moveSpeed * Time.deltaTime);
+                }
+                else
+                {
+                    if (!rb.isKinematic)
+                    {
+                        // 입력 없을 땐 잔류 속도 제거
+                        rb.velocity = Vector3.zero;
+                        rb.angularVelocity = Vector3.zero;
+                    }
+                }
+            }
+        }
 
         // 왼손에서 레이 발사
         ray.origin = left_hand.transform.position;
@@ -70,14 +89,17 @@ public class Left_handmoving : MonoBehaviour
             // 잡은 오브젝트가 붙이기 가능한 위치에 닿았고, 인덱스트리거를 누른 경우
             if (grabbedObject != null && OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.LTouch))
             {
-                if (hit.collider != null && hit.collider.GetComponent<AttachableSpot>() != null)
+                if (hit.collider != null && hit.collider.GetComponent<AttachableSpot>() is AttachableSpot spot && spot.snapTransform != null)
                 {
                     Debug.Log("붙이기 위치 감지됨: " + hit.collider.gameObject.name);
 
-                    grabbedObject.transform.parent = hit.collider.transform;
-                    grabbedObject.transform.localPosition = Vector3.zero;
-                    grabbedObject.transform.localRotation = Quaternion.identity;
+                    // 스냅 포지션 & 회전 적용
+                    grabbedObject.transform.position = spot.snapTransform.position;
+                    grabbedObject.transform.rotation = spot.snapTransform.rotation;
+                    // 부모 설정 (붙이기 효과)
+                    grabbedObject.transform.parent = spot.snapTransform;
 
+                    StartCoroutine(ShortVibration(0.1f));//진동 세기
                     grabbedObject = null; // 손에서 놓기
                 }
             }
@@ -94,7 +116,7 @@ public class Left_handmoving : MonoBehaviour
             if (grabbedObject != null)
             {
                 grabbedObject.transform.parent = null;
-                GameObject location = GameObject.Find(grabbedObject.name + "_"); // "오브젝트이름_" 형태의 기준 위치 찾기
+                GameObject location = GameObject.Find(grabbedObject.name + "_");// 잡은 오브젝트 이름 + "_" 형식의 복귀 위치 탐색
                 if (location != null)
                 {
                     grabbedObject.transform.eulerAngles = Vector3.zero;
@@ -104,6 +126,17 @@ public class Left_handmoving : MonoBehaviour
                 grabbedObject = null;
             }
         }
+    }
+    IEnumerator ShortVibration(float duration)
+    {
+        // 진동 시작: 강도 0.5, 주파수 0.5
+        OVRInput.SetControllerVibration(0.5f, 0.5f, OVRInput.Controller.LTouch);
+
+        // duration 초 기다림
+        yield return new WaitForSeconds(duration);
+
+        // 진동 정지
+        OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.LTouch);
     }
 }
 
