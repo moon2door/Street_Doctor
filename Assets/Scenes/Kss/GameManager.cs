@@ -1,7 +1,7 @@
-using UnityEngine;
 using System.Collections;
-using UnityEngine.UI;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,9 +14,13 @@ public class GameManager : MonoBehaviour
     public Transform pointC;                // 도착점
 
     public Image fadeImage;                 // 화면을 어둡게 덮을 단일 UI 이미지 (검정색)
+    public Image newFadeImage;
 
     private bool isGameOver = false;        // 게임 종료 여부 플래그
     private bool isGameStart = false;
+
+    public bool CanNextScene = true;
+
 
     void OnEnable()
     {
@@ -40,6 +44,7 @@ public class GameManager : MonoBehaviour
         if (gaugeManager.IsGaugeEmpty())
         {
             GameFail();
+            CanNextScene = true;
         }
         else if (timerManager.IsTimeUp())
         {
@@ -82,32 +87,65 @@ public class GameManager : MonoBehaviour
         ambulance.SetActive(false);
 
         resultText.text = "성공!";
+
+        yield return new WaitForSeconds(0.5f);
+
+        CanNextScene = true;
     }
 
     public IEnumerator FadeToBlack()
     {
-        float fadeDuration = 2f;
-        float elapsed = 0f;
-
-        if (fadeImage != null)
+        if (SceneManager.GetActiveScene().name == "_Webtoon_Scene_01")
         {
-            fadeImage.color = new Color(0f, 0f, 0f, 0f);
-            fadeImage.gameObject.SetActive(true);
+            float fadeDuration = 2f;
+            float elapsed = 0f;
 
-            while (elapsed < fadeDuration)
+            if (newFadeImage != null)
             {
-                float alpha = Mathf.Lerp(0f, 1f, elapsed / fadeDuration);
-                Color c = fadeImage.color;
-                c.a = alpha;
-                fadeImage.color = c;
+                newFadeImage.color = new Color(0f, 0f, 0f, 0f);
+                newFadeImage.gameObject.SetActive(true);
 
-                elapsed += Time.deltaTime;
-                yield return null;
+                while (elapsed < fadeDuration)
+                {
+                    float alpha = Mathf.Lerp(0f, 1f, elapsed / fadeDuration);
+                    Color c = newFadeImage.color;
+                    c.a = alpha;
+                    newFadeImage.color = c;
+
+                    elapsed += Time.deltaTime;
+                    yield return null;
+                }
+
+                Color finalColor = newFadeImage.color;
+                finalColor.a = 1f;
+                newFadeImage.color = finalColor;
             }
+        }
+        else
+        {
+            float fadeDuration = 2f;
+            float elapsed = 0f;
 
-            Color finalColor = fadeImage.color;
-            finalColor.a = 1f;
-            fadeImage.color = finalColor;
+            if (fadeImage != null)
+            {
+                fadeImage.color = new Color(0f, 0f, 0f, 0f);
+                fadeImage.gameObject.SetActive(true);
+
+                while (elapsed < fadeDuration)
+                {
+                    float alpha = Mathf.Lerp(0f, 1f, elapsed / fadeDuration);
+                    Color c = fadeImage.color;
+                    c.a = alpha;
+                    fadeImage.color = c;
+
+                    elapsed += Time.deltaTime;
+                    yield return null;
+                }
+
+                Color finalColor = fadeImage.color;
+                finalColor.a = 1f;
+                fadeImage.color = finalColor;
+            }
         }
     }
 
@@ -141,10 +179,14 @@ public class GameManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name == "C_Scene")
+        if (scene.name == "_InGame_Scene_01")
         {
             AssignUIObjects();
             isGameStart = true;
+        }
+        else if (scene.name == "_Webtoon_Scene_01")
+        {
+            AssignUIObjects_01();
         }
     }
 
@@ -181,5 +223,10 @@ public class GameManager : MonoBehaviour
         }
 
         ambulance.SetActive(false);
+    }
+
+    void AssignUIObjects_01()
+    {
+        newFadeImage = GameObject.Find("NewFadeOut")?.GetComponent<Image>();
     }
 }

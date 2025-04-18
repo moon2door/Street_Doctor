@@ -8,6 +8,7 @@ public class RH : MonoBehaviour
     GameObject right_H;                  // 오른손 앵커
     public GaugeManager gaugeManager;    // 게이지 관리자
     public GameManager gameManager;      // 게임 상태 관리자
+    public Tothelastscene tothelastscene;
 
     void OnEnable()
     {
@@ -35,8 +36,16 @@ public class RH : MonoBehaviour
             // 게임이 끝나지 않았을 때만 게이지가 참.
             if (gameManager != null && !gameManager.IsGameOver())
             {
-                // 게이지 매니저 의 게이지 트리거 메서드 실행
-                gaugeManager.GaugeTrigger();
+                if (SceneManager.GetActiveScene().name == "_InGame_Scene_01")
+                {
+                    // 게이지 매니저 의 게이지 트리거 메서드 실행
+                    gaugeManager.GaugeTrigger();
+                }
+
+                else if (SceneManager.GetActiveScene().name == "_Webtoon_Scene_01")
+                {
+                    tothelastscene.ShowNextImage();
+                }
             }
             else
             {
@@ -47,14 +56,25 @@ public class RH : MonoBehaviour
 
         if (OVRInput.GetDown(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.RTouch))
         {
-            StartCoroutine(ChangeScene());
+            if (SceneManager.GetActiveScene().name == "_Webtoon_Scene_01")
+            {
+                if (tothelastscene.allImagesShown)
+                {
+                    StartCoroutine(ChangeScene());
+                }
+            }
+            else if (gameManager.CanNextScene)
+            {
+                StartCoroutine(ChangeScene());
+                gameManager.CanNextScene = false;
+            }
         }
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // C 씬이 병합되었을 때만 실행
-        if (scene.name == "C_Scene")
+        if (scene.name == "_InGame_Scene_01")
         {
             AssignUIObjects();
         }
@@ -78,8 +98,17 @@ public class RH : MonoBehaviour
 
     IEnumerator ChangeScene()
     {
+        // 현재 씬 이름 확인
+        string currentScene = SceneManager.GetActiveScene().name;
+
+        // 다음 병합할 씬 설정
+        if (currentScene == "____Start")
+            DontDestroy.nextSceneName = "_Webtoon_Scene_01";
+        else if (currentScene == "_Webtoon_Scene_01")
+            DontDestroy.nextSceneName = "_InGame_Scene_01";
+
         yield return StartCoroutine(gameManager.FadeToBlack());
 
-        SceneManager.LoadScene("B_Scene_Loading"); // B 씬 (로딩 씬)으로 이동
+        SceneManager.LoadScene("__Loading_Scene"); // B 씬 (로딩 씬)으로 이동
     }
 }

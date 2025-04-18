@@ -34,7 +34,7 @@ public class Tothelastscene : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // 병합된 씬이 현재 활성화된 씬일 때만 실행
-        if (scene == SceneManager.GetActiveScene())
+        if (scene.name == "_Webtoon_Scene_01")
         {
             AssignUIObjects();
         }

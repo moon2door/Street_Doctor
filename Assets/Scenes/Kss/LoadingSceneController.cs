@@ -18,16 +18,18 @@ public class LoadingSceneController : MonoBehaviour
             gameManager = gmObj.GetComponent<GameManager>();
         }
 
-        StartCoroutine(LoadCScene());
+        StartCoroutine(LoadNextScene());
     }
 
-    IEnumerator LoadCScene()
+    IEnumerator LoadNextScene()
     {
         StartCoroutine(gameManager.FadeReturn());
 
         yield return new WaitForSeconds(1f);
 
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("C_Scene", LoadSceneMode.Additive);
+        string sceneToLoad = DontDestroy.nextSceneName;
+
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
         asyncLoad.allowSceneActivation = false;
 
         while (asyncLoad.progress < 0.9f)
@@ -46,7 +48,7 @@ public class LoadingSceneController : MonoBehaviour
         yield return StartCoroutine(FadeOutLoadingUI());
 
         // 로딩 완료된 후 B 씬 제거
-        SceneManager.UnloadSceneAsync("B_Scene_Loading");
+        SceneManager.UnloadSceneAsync("__Loading_Scene");
     }
 
     IEnumerator FadeOutLoadingUI()
