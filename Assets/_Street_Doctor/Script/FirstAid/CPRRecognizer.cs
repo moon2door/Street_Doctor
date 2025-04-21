@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class CPRRecognizer : MonoBehaviour
 {
     public GaugeManager gaugeManager;
+    public GameManager gameManager;
 
     public GameObject leftHand;
     public GameObject rightHand;
@@ -19,7 +20,7 @@ public class CPRRecognizer : MonoBehaviour
 
     private Coroutine vibrationCoroutine = null;
 
-    [Header("💡 Visual Feedback")]//트리거에 닿으면 색상 변경
+    [Header("Visual Feedback")]
     public Renderer chestRenderer;
     private Material chestMaterial;
     private Color baseColor;
@@ -43,8 +44,6 @@ public class CPRRecognizer : MonoBehaviour
             isCPRActive = true;
             StartGlow();
         }
-            
-
     }
 
     private void OnTriggerExit(Collider other)
@@ -56,10 +55,9 @@ public class CPRRecognizer : MonoBehaviour
 
         if (!leftIn || !rightIn)
         {
-            isCPRActive = false;        
+            isCPRActive = false;
             StopGlow();
         }
-            
     }
 
     private void Update()
@@ -83,15 +81,15 @@ public class CPRRecognizer : MonoBehaviour
             if (isPressing && headIsAbove && vibrationCoroutine == null)
             {
                 vibrationCoroutine = StartCoroutine(TriggerVibration());
-                Debug.Log("CPR 압박 인식 → 진동 시작");
+                Debug.Log("[CPRRecognizer] CPR 압박 인식 → 진동 시작");
 
-                if (gaugeManager != null)
-                    gaugeManager.GaugeTrigger();
+                if (gameManager != null)
+                    gameManager.TriggerCPR();
             }
             else if ((!isPressing || !headIsAbove) && vibrationCoroutine != null)
             {
                 StopVibration();
-                Debug.Log("⬆️ 손 올림 → 진동 멈춤");
+                Debug.Log("[CPRRecognizer] 손 올림 → 진동 멈춤");
             }
         }
     }
@@ -123,21 +121,21 @@ public class CPRRecognizer : MonoBehaviour
         AssignUIObjects();
     }
 
-    // 씬 내에서 UI 오브젝트 찾기
     void AssignUIObjects()
     {
         leftHand = GameObject.Find("LeftHandAnchor");
         rightHand = GameObject.Find("RightHandAnchor");
         headset = GameObject.Find("CenterEyeAnchor");
+        gameManager = GameObject.FindObjectOfType<GameManager>();
     }
 
     private void StartGlow()
     {
         if (chestMaterial != null && !isGlowing)
         {
-            chestMaterial.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive; // 강제 설정
+            chestMaterial.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
             chestMaterial.EnableKeyword("_EMISSION");
-            chestMaterial.SetColor("_EmissionColor", Color.yellow * 3f); // 밝기 조정
+            chestMaterial.SetColor("_EmissionColor", Color.yellow * 3f);
             isGlowing = true;
         }
     }
@@ -150,4 +148,3 @@ public class CPRRecognizer : MonoBehaviour
         }
     }
 }
-

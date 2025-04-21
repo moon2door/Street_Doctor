@@ -5,22 +5,28 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public GaugeManager gaugeManager;       // 게이지 관리 스크립트
-    public TimerManager timerManager;       // 타이머 관리 스크립트
-    public Text resultText;                 // 결과 텍스트 (성공/실패 출력용)
+    public GaugeManager gaugeManager;
+    public TimerManager timerManager;
+    public Text resultText;
+    public Text cprCountText;
 
-    public GameObject ambulance;            // 구급차
-    public Transform pointB;                // 시작점
-    public Transform pointC;                // 도착점
+    public GameObject ambulance;
+    public GameObject phoneObj;
+    public Transform pointB;
+    public Transform pointC;
 
-    public Image fadeImage;                 // 화면을 어둡게 덮을 단일 UI 이미지 (검정색)
+    public Image fadeImage;
     public Image newFadeImage;
 
-    private bool isGameOver = false;        // 게임 종료 여부 플래그
-    private bool isGameStart = false;
+    private bool isGameOver = false;
+    private bool phone_TF = false;
 
+    public bool isGameStart = false;
     public bool CanNextScene = true;
 
+    public int currentCPRCount = 0;
+    public int currentBreathCount = 0;
+    public bool isCPRPhase = true; // true: CPR, false: breath
 
     void OnEnable()
     {
@@ -34,7 +40,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        RestartGame(); // 게임 시작 시 초기화
+        RestartGame();
     }
 
     void Update()
@@ -50,6 +56,61 @@ public class GameManager : MonoBehaviour
         {
             StartCoroutine(HandleSuccessSequence());
         }
+    }
+
+    public void StartGamePhase()
+    {
+        isGameStart = true;
+        gaugeManager.ResetGauge();
+        timerManager.ResetTimer();
+        currentCPRCount = 0;
+        currentBreathCount = 0;
+        isCPRPhase = true;
+        UpdateCPRUI();
+    }
+
+    public void TriggerCPR()
+    {
+        if (!isGameStart || !isCPRPhase) return;
+
+        currentCPRCount++;
+        UpdateCPRUI();
+
+        if (currentCPRCount >= 30)
+        {
+            isCPRPhase = false;
+            currentBreathCount = 0;
+            UpdateCPRUI();
+        }
+
+        gaugeManager.GaugeTrigger();
+    }
+
+    public void TriggerBreath()
+    {
+        if (!isGameStart || isCPRPhase) return;
+
+        currentBreathCount++;
+        UpdateCPRUI();
+
+        if (currentBreathCount >= 2)
+        {
+            isCPRPhase = true;
+            currentCPRCount = 0;
+            UpdateCPRUI();
+        }
+
+        gaugeManager.MouseTrigger();
+    }
+
+    void UpdateCPRUI()
+    {
+        if (cprCountText == null) return;
+
+        if (isCPRPhase)
+            cprCountText.text = $"심폐소생술 {currentCPRCount}/30";
+        else
+            cprCountText.text = $"인공호흡 {currentBreathCount}/2";
     }
 
     void GameFail()
@@ -95,64 +156,35 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator FadeToBlack()
     {
-        if (SceneManager.GetActiveScene().name == "3_Cut")
+        float fadeDuration = 2f;
+        float elapsed = 0f;
+        Image targetImage = SceneManager.GetActiveScene().name == "3_Cut" ? newFadeImage : fadeImage;
+
+        if (targetImage != null)
         {
-            float fadeDuration = 2f;
-            float elapsed = 0f;
+            targetImage.color = new Color(0f, 0f, 0f, 0f);
+            targetImage.gameObject.SetActive(true);
 
-            if (newFadeImage != null)
+            while (elapsed < fadeDuration)
             {
-                newFadeImage.color = new Color(0f, 0f, 0f, 0f);
-                newFadeImage.gameObject.SetActive(true);
+                float alpha = Mathf.Lerp(0f, 1f, elapsed / fadeDuration);
+                Color c = targetImage.color;
+                c.a = alpha;
+                targetImage.color = c;
 
-                while (elapsed < fadeDuration)
-                {
-                    float alpha = Mathf.Lerp(0f, 1f, elapsed / fadeDuration);
-                    Color c = newFadeImage.color;
-                    c.a = alpha;
-                    newFadeImage.color = c;
-
-                    elapsed += Time.deltaTime;
-                    yield return null;
-                }
-
-                Color finalColor = newFadeImage.color;
-                finalColor.a = 1f;
-                newFadeImage.color = finalColor;
+                elapsed += Time.deltaTime;
+                yield return null;
             }
-        }
-        else
-        {
-            float fadeDuration = 2f;
-            float elapsed = 0f;
 
-            if (fadeImage != null)
-            {
-                fadeImage.color = new Color(0f, 0f, 0f, 0f);
-                fadeImage.gameObject.SetActive(true);
-
-                while (elapsed < fadeDuration)
-                {
-                    float alpha = Mathf.Lerp(0f, 1f, elapsed / fadeDuration);
-                    Color c = fadeImage.color;
-                    c.a = alpha;
-                    fadeImage.color = c;
-
-                    elapsed += Time.deltaTime;
-                    yield return null;
-                }
-
-                Color finalColor = fadeImage.color;
-                finalColor.a = 1f;
-                fadeImage.color = finalColor;
-            }
+            Color finalColor = targetImage.color;
+            finalColor.a = 1f;
+            targetImage.color = finalColor;
         }
     }
 
     public IEnumerator FadeReturn()
     {
         fadeImage.color = new Color(0, 0, 0, 0);
-
         yield return null;
     }
 
@@ -183,16 +215,30 @@ public class GameManager : MonoBehaviour
         {
             AssignUIObjects();
             isGameStart = true;
+            phoneObj.SetActive(true);
+            phone_TF = true;
         }
         else if (scene.name == "3_Cut")
         {
             AssignUIObjects_01();
+
+            phone_TF = false;
+
+            phoneObj.SetActive(false);
+        }
+        else
+        {
+            phone_TF = false;
+
+            phoneObj.SetActive(false);
         }
     }
 
     void AssignUIObjects()
     {
         resultText = GameObject.Find("resultText")?.GetComponent<Text>();
+        cprCountText = GameObject.Find("cprCountText")?.GetComponent<Text>();
+
         ambulance = GameObject.Find("ambulance");
         pointB = GameObject.Find("pointB")?.transform;
         pointC = GameObject.Find("pointC")?.transform;

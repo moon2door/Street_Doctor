@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -6,8 +6,7 @@ using UnityEngine.UI;
 
 public class LoadingSceneController : MonoBehaviour
 {
-    public Slider loadingBar;
-    public CanvasGroup loadingCanvasGroup; // ÆäÀÌµå ¾Æ¿ô¿ë
+    public CanvasGroup loadingCanvasGroup; // í˜ì´ë“œ ì•„ì›ƒìš©
     public GameManager gameManager;
 
     void Start()
@@ -25,29 +24,28 @@ public class LoadingSceneController : MonoBehaviour
     {
         StartCoroutine(gameManager.FadeReturn());
 
-        yield return new WaitForSeconds(1f);
-
         string sceneToLoad = DontDestroy.nextSceneName;
 
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
         asyncLoad.allowSceneActivation = false;
 
-        while (asyncLoad.progress < 0.9f)
+        float minLoadTime = 2f;
+        float elapsed = 0f;
+
+        while (asyncLoad.progress < 0.9f || elapsed < minLoadTime)
         {
-            loadingBar.value = asyncLoad.progress;
+            elapsed += Time.deltaTime;
             yield return null;
         }
 
-        loadingBar.value = 1f;
-        yield return new WaitForSeconds(0.5f);
-
-        asyncLoad.allowSceneActivation = true;
-
-
-        // ·Îµù ¿Ï·á ÈÄ ÆäÀÌµå ¾Æ¿ô
+        // âœ… ë¨¼ì € í˜ì´ë“œ ì•„ì›ƒ ì‹¤í–‰
         yield return StartCoroutine(FadeOutLoadingUI());
 
-        // ·Îµù ¿Ï·áµÈ ÈÄ B ¾À Á¦°Å
+        // âœ… UI ì‚¬ë¼ì§„ ë’¤ ì”¬ í™œì„±í™”
+        asyncLoad.allowSceneActivation = true;
+
+        // âœ… ë‹¤ìŒ í”„ë ˆì„ì— ë¡œë”©ì”¬ ì œê±° (ì”¬ì´ ì™„ì „íˆ ì „í™˜ëœ ì´í›„)
+        yield return null;
         SceneManager.UnloadSceneAsync("2_Load");
     }
 

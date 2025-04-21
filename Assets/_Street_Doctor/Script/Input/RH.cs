@@ -1,32 +1,33 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class RH : MonoBehaviour
 {
-    LineRenderer myLR;                  // »óÈ£ÀÛ¿ë ¶óÀÎÀ» ±×¸± ¶óÀÎ·»´õ·¯
-    GameObject right_H;                // ¿À¸¥¼Õ ¾ŞÄ¿ °´Ã¼
-    Ray ray;                            // »óÈ£ÀÛ¿ë¿ë Ray
-    RaycastHit hit;                     // Ray Ãæµ¹ Á¤º¸
+    LineRenderer myLR;                  // ìƒí˜¸ì‘ìš© ë¼ì¸ì„ ê·¸ë¦´ ë¼ì¸ë Œë”ëŸ¬
+    GameObject right_H;                // ì˜¤ë¥¸ì† ì•µì»¤ ê°ì²´
+    Ray ray;                            // ìƒí˜¸ì‘ìš©ìš© Ray
+    RaycastHit hit;                     // Ray ì¶©ëŒ ì •ë³´
 
-    public Transform playerRoot;        // ÇÃ·¹ÀÌ¾î ·çÆ® ¿ÀºêÁ§Æ® (È¸Àü¿ë)
-    public float rotationSpeed = 45f;   // ÇÃ·¹ÀÌ¾î È¸Àü ¼Óµµ
+    public Transform playerRoot;        // í”Œë ˆì´ì–´ ë£¨íŠ¸ ì˜¤ë¸Œì íŠ¸ (íšŒì „ìš©)
+    public float rotationSpeed = 45f;   // í”Œë ˆì´ì–´ íšŒì „ ì†ë„
 
-    public GaugeManager gaugeManager;   // °ÔÀÌÁö ¸Å´ÏÀú
-    public GameManager gameManager;     // °ÔÀÓ ¸Å´ÏÀú
-    public Tothelastscene tothelastscene; // ÀÌ¹ÌÁö Àç»ı ÈÄ ¾À ÀüÈ¯ Å¬·¡½º
+    public GaugeManager gaugeManager;   // ê²Œì´ì§€ ë§¤ë‹ˆì €
+    public GameManager gameManager;     // ê²Œì„ ë§¤ë‹ˆì €
+    public Tothelastscene tothelastscene; // ì´ë¯¸ì§€ ì¬ìƒ í›„ ì”¬ ì „í™˜ í´ë˜ìŠ¤
 
-    private GameObject grabbedObject = null; // ÇöÀç ÀâÀº ¿ÀºêÁ§Æ®
-    private bool doorOpened = false;         // ¹®ÀÌ ¿­·È´ÂÁö ¿©ºÎ
+    private GameObject grabbedObject = null; // í˜„ì¬ ì¡ì€ ì˜¤ë¸Œì íŠ¸
+    private bool doorOpened = false;         // ë¬¸ì´ ì—´ë ¸ëŠ”ì§€ ì—¬ë¶€
 
-    // ¾À ·Îµå ½Ã ÀÌº¥Æ® µî·Ï
+    // ì”¬ ë¡œë“œ ì‹œ ì´ë²¤íŠ¸ ë“±ë¡
     void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
     void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
     void Start()
     {
-        // ¶óÀÎ·»´õ·¯ ¹× ¿À¸¥¼Õ À§Ä¡ ÃÊ±âÈ­
+        // ë¼ì¸ë Œë”ëŸ¬ ë° ì˜¤ë¥¸ì† ìœ„ì¹˜ ì´ˆê¸°í™”
         myLR = GetComponent<LineRenderer>();
         right_H = GameObject.Find("RightHandAnchor");
         transform.position = right_H.transform.position;
@@ -36,18 +37,20 @@ public class RH : MonoBehaviour
 
     void Update()
     {
-        HandleInteractionRay();   // »óÈ£ÀÛ¿ë¿ë ·¹ÀÌ Ã³¸®
-        HandlePlayerRotation();   // ÇÃ·¹ÀÌ¾î È¸Àü Ã³¸®
-        HandleGrabRelease();      // ÀâÀº ¿ÀºêÁ§Æ® ³õ±â Ã³¸®
+        HandleInteractionRay();   // ìƒí˜¸ì‘ìš©ìš© ë ˆì´ ì²˜ë¦¬
+        HandlePlayerRotation();   // í”Œë ˆì´ì–´ íšŒì „ ì²˜ë¦¬
+        HandleGrabRelease();      // ì¡ì€ ì˜¤ë¸Œì íŠ¸ ë†“ê¸° ì²˜ë¦¬
     }
 
-    // ¼Õ¿¡¼­ ³ª¿À´Â ·¹ÀÌ·Î ¿ÀºêÁ§Æ®¿Í »óÈ£ÀÛ¿ë
+    // ì†ì—ì„œ ë‚˜ì˜¤ëŠ” ë ˆì´ë¡œ ì˜¤ë¸Œì íŠ¸ì™€ ìƒí˜¸ì‘ìš©
     void HandleInteractionRay()
     {
         ray.origin = right_H.transform.position;
         ray.direction = right_H.transform.forward;
         myLR.SetPosition(0, ray.origin);
         myLR.SetPosition(1, ray.origin + ray.direction * 3);
+
+
 
         if (SceneManager.GetActiveScene().name == "3_Cut" && !tothelastscene.allImagesShown)
         {
@@ -66,14 +69,14 @@ public class RH : MonoBehaviour
         }
 
 
-        // Ãæµ¹ÇÑ ¿ÀºêÁ§Æ®°¡ ÀÖ´Â °æ¿ì
+        // ì¶©ëŒí•œ ì˜¤ë¸Œì íŠ¸ê°€ ìˆëŠ” ê²½ìš°
         if (Physics.Raycast(ray, out hit, 3f))
         {
             myLR.startColor = Color.green;
             myLR.endColor = Color.green;
             myLR.SetPosition(1, hit.point);
 
-            // ¹® »óÈ£ÀÛ¿ë (¹®ÀÌ ¿­·È´ÂÁö Ã¼Å©ÇÏ°í ÄÆ¾ÀÀ¸·Î ÀüÈ¯)
+            // ë¬¸ ìƒí˜¸ì‘ìš© (ë¬¸ì´ ì—´ë ¸ëŠ”ì§€ ì²´í¬í•˜ê³  ì»·ì”¬ìœ¼ë¡œ ì „í™˜)
             if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch))
             {
                 DoorInteraction door = hit.collider.gameObject.GetComponentInParent<DoorInteraction>();
@@ -86,7 +89,7 @@ public class RH : MonoBehaviour
                 }
             }
 
-            // ¿ÀºêÁ§Æ® Áı±â
+            // ì˜¤ë¸Œì íŠ¸ ì§‘ê¸°
             if (OVRInput.GetDown(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.RTouch) && hit.collider.GetComponent<GrabObject>() != null)
             {
                 grabbedObject = hit.collider.gameObject;
@@ -95,7 +98,7 @@ public class RH : MonoBehaviour
                 grabbedObject.transform.eulerAngles = Vector3.zero;
             }
 
-            // ¿ÀºêÁ§Æ® °íÁ¤ ÁöÁ¡¿¡ ºÎÂø
+            // ì˜¤ë¸Œì íŠ¸ ê³ ì • ì§€ì ì— ë¶€ì°©
             if (grabbedObject != null && OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch))
             {
                 if (hit.collider.GetComponent<AttachableSpot>() is AttachableSpot spot && spot.snapTransform != null)
@@ -110,13 +113,13 @@ public class RH : MonoBehaviour
         }
         else
         {
-            // ·¹ÀÌ Ãæµ¹ ¾øÀ» °æ¿ì ¶óÀÎ »ö»ó º¯°æ
+            // ë ˆì´ ì¶©ëŒ ì—†ì„ ê²½ìš° ë¼ì¸ ìƒ‰ìƒ ë³€ê²½
             myLR.startColor = Color.red;
             myLR.endColor = Color.red;
         }
     }
 
-    // ¿À¸¥ÂÊ ½ºÆ½ ÁÂ¿ì·Î ÇÃ·¹ÀÌ¾î È¸Àü
+    // ì˜¤ë¥¸ìª½ ìŠ¤í‹± ì¢Œìš°ë¡œ í”Œë ˆì´ì–´ íšŒì „
     void HandlePlayerRotation()
     {
         Vector2 input = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
@@ -127,7 +130,7 @@ public class RH : MonoBehaviour
         }
     }
 
-    // ÀâÀº ¿ÀºêÁ§Æ® ³õ±â Ã³¸®
+    // ì¡ì€ ì˜¤ë¸Œì íŠ¸ ë†“ê¸° ì²˜ë¦¬
     void HandleGrabRelease()
     {
         if (OVRInput.GetUp(OVRInput.Button.PrimaryHandTrigger, OVRInput.Controller.RTouch) && grabbedObject != null)
@@ -144,12 +147,12 @@ public class RH : MonoBehaviour
         }
     }
 
-    // ÆäÀÌµå ¾Æ¿ô -> ´ÙÀ½ ¾À ·Îµå
+    // í˜ì´ë“œ ì•„ì›ƒ -> ë‹¤ìŒ ì”¬ ë¡œë“œ
     IEnumerator WaitAndChangeScene()
     {
         string currentScene = SceneManager.GetActiveScene().name;
 
-        // ÇöÀç ¾ÀÀÌ 1_Start¸é 3_CutÀ¸·Î, 3_CutÀÌ¸é 4_CPR·Î ¼³Á¤
+        // í˜„ì¬ ì”¬ì´ 1_Startë©´ 3_Cutìœ¼ë¡œ, 3_Cutì´ë©´ 4_CPRë¡œ ì„¤ì •
         if (currentScene == "1_Start")
         {
             DontDestroy.nextSceneName = "3_Cut";
@@ -164,15 +167,15 @@ public class RH : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("¿¹»óÄ¡ ¸øÇÑ ¾À ÀÌ¸§: " + currentScene);
-            yield break; // ´ÙÀ½ ¾ÀÀ» ÁöÁ¤ÇÏÁö ¾Ê¾ÒÀ¸¹Ç·Î Áß´Ü
+            Debug.LogWarning("ì˜ˆìƒì¹˜ ëª»í•œ ì”¬ ì´ë¦„: " + currentScene);
+            yield break; // ë‹¤ìŒ ì”¬ì„ ì§€ì •í•˜ì§€ ì•Šì•˜ìœ¼ë¯€ë¡œ ì¤‘ë‹¨
         }
 
         yield return StartCoroutine(gameManager.FadeToBlack());
         SceneManager.LoadScene("2_Load");
     }
 
-    // ÂªÀº Áøµ¿ È¿°ú
+    // ì§§ì€ ì§„ë™ íš¨ê³¼
     IEnumerator ShortVibration(float duration)
     {
         OVRInput.SetControllerVibration(0.5f, 0.5f, OVRInput.Controller.RTouch);
@@ -180,13 +183,13 @@ public class RH : MonoBehaviour
         OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.RTouch);
     }
 
-    // ¾À ·Îµå ÈÄ °ÔÀÌÁö ¿ÀºêÁ§Æ® Ã£±â
+    // ì”¬ ë¡œë“œ í›„ ê²Œì´ì§€ ì˜¤ë¸Œì íŠ¸ ì°¾ê¸°
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "4_CPR") AssignUIObjects();
     }
 
-    // ¾À ³»¿¡¼­ UI ¿ÀºêÁ§Æ® Ã£±â
+    // ì”¬ ë‚´ì—ì„œ UI ì˜¤ë¸Œì íŠ¸ ì°¾ê¸°
     void AssignUIObjects()
     {
         var gaugeManagerObj = GameObject.Find("GaugeManager");
