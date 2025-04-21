@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator FadeToBlack()
     {
-        if (SceneManager.GetActiveScene().name == "_Webtoon_Scene_01")
+        if (SceneManager.GetActiveScene().name == "3_Cut")
         {
             float fadeDuration = 2f;
             float elapsed = 0f;
@@ -179,12 +179,12 @@ public class GameManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name == "_InGame_Scene_01")
+        if (scene.name == "4_CPR")
         {
             AssignUIObjects();
             isGameStart = true;
         }
-        else if (scene.name == "_Webtoon_Scene_01")
+        else if (scene.name == "3_Cut")
         {
             AssignUIObjects_01();
         }

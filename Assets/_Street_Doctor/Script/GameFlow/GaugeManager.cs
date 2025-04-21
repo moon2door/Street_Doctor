@@ -7,6 +7,8 @@ public class GaugeManager : MonoBehaviour
     public float decreaseSpeed = 5f;  // 게이지 감소 속도
     public float fillAmount = 10f;    // 게이지 채우기량
 
+    public float fillMouseAmount = 0.2f;
+
     private bool isStopped = false;   // 게이지 정지 여부
 
     void Start()
@@ -47,6 +49,12 @@ public class GaugeManager : MonoBehaviour
     public void GaugeTrigger()
     {
         gaugeSlider.value += fillAmount;
+        gaugeSlider.value = Mathf.Min(gaugeSlider.maxValue, gaugeSlider.value); // 최대치 제한
+    }
+
+    public void MouseTrigger()
+    {
+        gaugeSlider.value += fillMouseAmount;
         gaugeSlider.value = Mathf.Min(gaugeSlider.maxValue, gaugeSlider.value); // 최대치 제한
     }
 }

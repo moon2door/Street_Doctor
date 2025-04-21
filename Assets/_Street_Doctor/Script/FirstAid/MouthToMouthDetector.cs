@@ -5,6 +5,7 @@ using UnityEngine;
 public class MouthToMouthDetector : MonoBehaviour
 {
     public Transform centerEyeAnchor;       // OVRCameraRig/CenterEyeAnchor
+    public GaugeManager gaugeManager;
     public float activationRadius = 0.2f;   // 입과 머리의 거리 허용 범위
     public float requiredTime = 3f;         // 머물러야 할 시간
     public float cooldownTime = 1f;         // 인식 간격 제한 (중복 방지 딜레이)
@@ -12,6 +13,23 @@ public class MouthToMouthDetector : MonoBehaviour
     private float timer = 0f;
     private bool isInZone = false;
     private float cooldownTimer = 0f;
+
+    private void Start()
+    {
+        if (centerEyeAnchor == null)
+        {
+            GameObject centerEyeObj = GameObject.Find("CenterEyeAnchor");
+            if (centerEyeObj != null)
+            {
+                centerEyeAnchor = centerEyeObj.transform;
+                Debug.Log("centerEyeAnchor 자동 할당됨");
+            }
+            else
+            {
+                Debug.LogWarning("centerEyeAnchor를 찾을 수 없습니다!");
+            }
+        }
+    }
 
     void Update()
     {
@@ -38,7 +56,7 @@ public class MouthToMouthDetector : MonoBehaviour
             if (timer >= requiredTime)
             {
                 Debug.Log("✅ 인공호흡 성공!");
-                // TODO: 효과 발생, 점수 증가, 애니메이션 등
+                gaugeManager.MouseTrigger();
                 cooldownTimer = cooldownTime; // 중복 방지 대기
                 isInZone = false;
             }

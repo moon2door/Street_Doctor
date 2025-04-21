@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DontDestroy : MonoBehaviour
 {
-    public static string nextSceneName = "_Webtoon_Scene_01";
+    public static string nextSceneName = "3_Cut";
 
     private void Awake()
     {

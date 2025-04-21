@@ -6,8 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/_Street_Doctor/Scene/1_Start.unity
+    guid: be87792c77798094caa385082a5cde82
+  - enabled: 1
+    path: Assets/_Street_Doctor/Scene/2_Load.unity
+    guid: 6f0d20e0ad660f545bd421d352ecd5d6
+  - enabled: 1
+    path: Assets/_Street_Doctor/Scene/3_Cut.unity
+    guid: 668640dc1c498a844a332f35ea0b5063
+  - enabled: 1
+    path: Assets/_Street_Doctor/Scene/4_CPR.unity
+    guid: a93480fab3d997a44abc25474619e3e9
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 82a83635ab48d694bac61acb9ed8c3fa,
       type: 2}

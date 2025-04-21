@@ -48,7 +48,7 @@ public class LoadingSceneController : MonoBehaviour
         yield return StartCoroutine(FadeOutLoadingUI());
 
         // 로딩 완료된 후 B 씬 제거
-        SceneManager.UnloadSceneAsync("__Loading_Scene");
+        SceneManager.UnloadSceneAsync("2_Load");
     }
 
     IEnumerator FadeOutLoadingUI()
