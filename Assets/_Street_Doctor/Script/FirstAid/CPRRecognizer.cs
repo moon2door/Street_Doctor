@@ -9,6 +9,7 @@ public class CPRRecognizer : MonoBehaviour
     public GameObject leftHand;
     public GameObject rightHand;
     public GameObject headset;
+
     public float chestY = 0.5f;
     public float pressDepth = 0.015f;
 
@@ -17,6 +18,12 @@ public class CPRRecognizer : MonoBehaviour
     public bool isCPRActive { get; private set; } = false;
 
     private Coroutine vibrationCoroutine = null;
+
+    [Header("💡 Visual Feedback")]//트리거에 닿으면 색상 변경
+    public Renderer chestRenderer;
+    private Material chestMaterial;
+    private Color baseColor;
+    private bool isGlowing = false;
 
     void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
     void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -32,7 +39,12 @@ public class CPRRecognizer : MonoBehaviour
         if (other.name == "Right_Hand") rightIn = true;
 
         if (leftIn && rightIn)
+        {
             isCPRActive = true;
+            StartGlow();
+        }
+            
+
     }
 
     private void OnTriggerExit(Collider other)
@@ -43,7 +55,11 @@ public class CPRRecognizer : MonoBehaviour
         StopVibration();
 
         if (!leftIn || !rightIn)
-            isCPRActive = false;
+        {
+            isCPRActive = false;        
+            StopGlow();
+        }
+            
     }
 
     private void Update()
@@ -113,6 +129,25 @@ public class CPRRecognizer : MonoBehaviour
         leftHand = GameObject.Find("LeftHandAnchor");
         rightHand = GameObject.Find("RightHandAnchor");
         headset = GameObject.Find("CenterEyeAnchor");
+    }
+
+    private void StartGlow()
+    {
+        if (chestMaterial != null && !isGlowing)
+        {
+            chestMaterial.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive; // 강제 설정
+            chestMaterial.EnableKeyword("_EMISSION");
+            chestMaterial.SetColor("_EmissionColor", Color.yellow * 3f); // 밝기 조정
+            isGlowing = true;
+        }
+    }
+    private void StopGlow()
+    {
+        if (chestMaterial != null && isGlowing)
+        {
+            chestMaterial.SetColor("_EmissionColor", baseColor);
+            isGlowing = false;
+        }
     }
 }
 
