@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -7,6 +8,10 @@ public class CallingUIManager : MonoBehaviour
     public GameObject callCanvas;
     public Text guideText;
     public GameObject phoneObject;
+
+    public Image cprcountImage;
+
+    public KeypadTouchInput keypadTouchInput;
 
     void OnEnable()
     {
@@ -27,6 +32,7 @@ public class CallingUIManager : MonoBehaviour
     {
         callCanvas.SetActive(true);
         phoneObject.SetActive(true);
+        cprcountImage.gameObject.SetActive(false);
         guideText.text = "왼손의 휴대폰으로 119에 신고하세요!";
     }
 
@@ -34,6 +40,9 @@ public class CallingUIManager : MonoBehaviour
     {
         guideText.text = "신고가 완료되었습니다! \n이제 환자를 구출하러 가요!";
         phoneObject.SetActive(false);
+        callCanvas.SetActive(false);
+        cprcountImage.gameObject.SetActive(true);
+        StartCoroutine(DeleteMessage());    
     }
 
     public void ShowErrorMessage()
@@ -49,5 +58,13 @@ public class CallingUIManager : MonoBehaviour
     void AssignUIObjects()
     {
         phoneObject = GameObject.Find("Phone");
+        keypadTouchInput = GameObject.Find("FingerTip_R ")?.GetComponent<KeypadTouchInput>();   
+    }
+
+    IEnumerator DeleteMessage()
+    {
+        yield return new WaitForSeconds(3f);
+
+        guideText.gameObject.SetActive(false);
     }
 }

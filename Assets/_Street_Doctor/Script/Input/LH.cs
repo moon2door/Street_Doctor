@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LH : MonoBehaviour
 {
@@ -27,6 +28,9 @@ public class LH : MonoBehaviour
             gameManager = gmObj.GetComponent<GameManager>();
         else
             Debug.LogWarning("GameManager 오브젝트를 찾지 못했습니다. LH에서");
+
+
+        StartCoroutine(AssignUIObjects001());
     }
 
     void Update()
@@ -127,5 +131,12 @@ public class LH : MonoBehaviour
         OVRInput.SetControllerVibration(0.5f, 0.5f, OVRInput.Controller.LTouch);
         yield return new WaitForSeconds(duration);
         OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.LTouch);
+    }
+
+    IEnumerator AssignUIObjects001()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        playerRoot = GameObject.Find("PlayerRoot(Clone)")?.GetComponent<Transform>();
     }
 }

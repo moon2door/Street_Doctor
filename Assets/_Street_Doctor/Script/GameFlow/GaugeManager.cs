@@ -9,12 +9,14 @@ public class GaugeManager : MonoBehaviour
 
     public float fillMouseAmount = 0.2f;
 
-    private bool isStopped = false;   // 게이지 정지 여부
+    private bool isStopped = true;   // 게이지 정지 여부
 
     void Start()
     {
         // 시작 시 게이지를 최대치로 설정
         gaugeSlider.value = gaugeSlider.maxValue;
+        ResetGauge();
+        StopGauge();
     }
 
     void Update()

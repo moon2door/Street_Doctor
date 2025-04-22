@@ -23,10 +23,13 @@ public class GameManager : MonoBehaviour
 
     public bool isGameStart = false;
     public bool CanNextScene = true;
+    public bool gameClear = false;
 
     public int currentCPRCount = 0;
     public int currentBreathCount = 0;
     public bool isCPRPhase = true; // true: CPR, false: breath
+
+    private string triggeredObjectName = null;
 
     void OnEnable()
     {
@@ -40,7 +43,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        RestartGame();
+        
     }
 
     void Update()
@@ -108,9 +111,9 @@ public class GameManager : MonoBehaviour
         if (cprCountText == null) return;
 
         if (isCPRPhase)
-            cprCountText.text = $"심폐소생술 {currentCPRCount}/30";
+            cprCountText.text = $"심폐소생술을 진행해야 합니다!\n양 손을 모아 가슴의 빨간 큐브를 \n충분히 눌렀다 떼세요.\n\n흉부압박 진행중 {currentCPRCount}회 / 30회";
         else
-            cprCountText.text = $"인공호흡 {currentBreathCount}/2";
+            cprCountText.text = $"이제 인공호흡을 해야해요!\n입의 빨간 큐브에 얼굴을 \nn초이상 가져다 대세요.\n\n인공호흡 진행중 {currentBreathCount}회 / 2회";
     }
 
     void GameFail()
@@ -143,15 +146,11 @@ public class GameManager : MonoBehaviour
 
         ambulance.transform.position = pointC.position;
 
-        yield return StartCoroutine(FadeToBlack());
-
-        ambulance.SetActive(false);
-
-        resultText.text = "성공!";
-
-        yield return new WaitForSeconds(0.5f);
-
         CanNextScene = true;
+
+        StartCoroutine(WaitAndChangeScene());
+
+
     }
 
     public IEnumerator FadeToBlack()
@@ -275,4 +274,51 @@ public class GameManager : MonoBehaviour
     {
         newFadeImage = GameObject.Find("NewFadeOut")?.GetComponent<Image>();
     }
+
+    public void SetTriggeredObject(string objName)
+    {
+        triggeredObjectName = objName;
+        Debug.Log("[Trigger] 플레이어가 닿은 오브젝트: " + objName);
+        StartCoroutine(WaitAndChangeScene());
+    }
+
+
+    IEnumerator WaitAndChangeScene()
+    {
+        string currentScene = SceneManager.GetActiveScene().name;
+
+        if (currentScene == "4_CPR")
+        {
+            if (gameClear)
+            {
+                DontDestroy.nextSceneName = "5_CPREnding";
+            }
+            else if (!gameClear)
+            {
+                gameClear = true;
+                DontDestroy.nextSceneName = "1_Start";
+            }
+        }
+        else if (currentScene == "5_CPREnding")
+        {
+            if (triggeredObjectName == "StartTrigger") // 처음으로 트리거
+            {
+                DontDestroy.nextSceneName = "1_Start";
+            }
+            else
+            {
+                Debug.LogWarning("트리거된 오브젝트가 없습니다.");
+                yield break;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("예상치 못한 씬 이름: " + currentScene);
+            yield break;
+        }
+
+        yield return StartCoroutine(FadeToBlack());
+        SceneManager.LoadScene("2_Load");
+    }
+
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class DontDestroy : MonoBehaviour
 {
@@ -8,14 +9,14 @@ public class DontDestroy : MonoBehaviour
 
     private void Awake()
     {
-        GameObject[] allObjects = FindObjectsOfType<GameObject>();
+        GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
 
         foreach (GameObject obj in allObjects)
         {
             if (obj != this.gameObject && obj.name == this.gameObject.name)
             {
-                Destroy(this.gameObject);
-                return;
+                Destroy(obj);
+                Debug.Log($"ªË¡¶µ : {obj.name}");
             }
         }
 

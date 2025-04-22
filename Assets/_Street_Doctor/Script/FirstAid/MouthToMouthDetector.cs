@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MouthToMouthDetector : MonoBehaviour
 {
@@ -31,6 +30,7 @@ public class MouthToMouthDetector : MonoBehaviour
         }
 
         gameManager = GameObject.FindObjectOfType<GameManager>();
+
     }
 
     void Update()
@@ -52,6 +52,7 @@ public class MouthToMouthDetector : MonoBehaviour
             {
                 isInZone = true;
                 timer = 0f;
+
                 Debug.Log("[MouthToMouth] 머리 위치 인식 시작");
             }
 

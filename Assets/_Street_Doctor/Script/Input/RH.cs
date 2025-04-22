@@ -33,6 +33,8 @@ public class RH : MonoBehaviour
         transform.position = right_H.transform.position;
         transform.eulerAngles = right_H.transform.eulerAngles;
         transform.parent = right_H.transform;
+
+        StartCoroutine(AssignUIObjects001());
     }
 
     void Update()
@@ -161,10 +163,6 @@ public class RH : MonoBehaviour
         {
             DontDestroy.nextSceneName = "4_CPR";
         }
-        else if (currentScene == "4_CPR")
-        {
-            DontDestroy.nextSceneName = "1_Start";
-        }
         else
         {
             Debug.LogWarning("예상치 못한 씬 이름: " + currentScene);
@@ -203,5 +201,12 @@ public class RH : MonoBehaviour
                     gaugeManager.gaugeSlider = sliderObj.GetComponent<Slider>();
             }
         }
+    }
+
+    IEnumerator AssignUIObjects001()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        playerRoot = GameObject.Find("PlayerRoot(Clone)")?.GetComponent<Transform>();
     }
 }

@@ -7,6 +7,8 @@ public class KeypadTouchInput : MonoBehaviour
 {
     public Text inputText;                 // 전화번호 출력용 텍스트
     public CallingUIManager callUIManager;   // 신고 UI 제어
+    public GameManager gameManager;
+
     private string currentNumber = "";
 
     private bool canTouch = true;         // 터치 딜레이 컨트롤
@@ -30,13 +32,16 @@ public class KeypadTouchInput : MonoBehaviour
         }
         else if (tag == "CallButton")
         {
+            Debug.LogError("콜버튼 눌림!");
+
             StartCoroutine(TouchDelay());
 
             if (currentNumber == "119")
             {
                 Debug.Log("✅ 119 신고 완료!");
                 callUIManager.ShowCompleteMessage();
-                gameObject.SetActive(false); // 이후 터치 비활성화
+                gameManager.StartGamePhase();
+
             }
             else
             {
@@ -44,6 +49,10 @@ public class KeypadTouchInput : MonoBehaviour
                 callUIManager.ShowErrorMessage();
                 StartCoroutine(BlinkText());
             }
+        }
+        else
+        {
+            Debug.LogError("아무것도 입력안됨!");
         }
     }
 

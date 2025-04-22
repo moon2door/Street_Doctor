@@ -9,7 +9,7 @@ public class TimerManager : MonoBehaviour
     private float timer = 0f;           // 현재 시간
     public bool isTimeUp = false;       // 타이머 종료 여부
 
-    private bool isStopped = false;   // 타이머 정지 여부
+    private bool isStopped = true;   // 타이머 정지 여부
 
     // 전체 시간을 초 단위로 반환하는 프로퍼티
     public float TotalTimeInSeconds => playTimeMinutes * 60f;
@@ -18,6 +18,7 @@ public class TimerManager : MonoBehaviour
     {
         // 시작하면 타이머를 리셋함
         ResetTimer();
+        isStopped = true;
     }
 
     void Update()
@@ -30,7 +31,7 @@ public class TimerManager : MonoBehaviour
         timer -= Time.deltaTime;
 
         // 시간 텍스트 갱신
-        timerText.text = $"{Mathf.Max(timer, 0):F1}초";
+        timerText.text = $"구급차가 도착하기까지 : {Mathf.Max(timer, 0):F1}초";
 
         // 만약 타이머가 0 이하라면
         if (timer <= 0f)
@@ -47,6 +48,7 @@ public class TimerManager : MonoBehaviour
 
     public bool IsTimeUp()
     {
+
         // 이 메서드가 실행되면 isTimeUp 값 반환
         return isTimeUp;
     }
