@@ -38,8 +38,6 @@ public class BandageWrapDetector : MonoBehaviour
             float angle = Vector3.Angle(lastDirection, currentDir);
             totalRotation += angle;
 
-            // 테스트 로그
-            Debug.Log($"[Bandage Wrap] 누적 회전량: {totalRotation:F1}도");
         }
 
         lastDirection = currentDir;
