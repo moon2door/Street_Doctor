@@ -13,8 +13,17 @@ public class KeypadTouchInput : MonoBehaviour
 
     private bool canTouch = true;         // 터치 딜레이 컨트롤
 
+    public AudioClip effectSound;           // 한 번 재생할 사운드 클립
+    public AudioClip effectSound1;           // 한 번 재생할 사운드 클립
+    private AudioSource audioSource;        // AudioSource 컴포넌트
+
     void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
     void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
+
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -24,6 +33,8 @@ public class KeypadTouchInput : MonoBehaviour
 
         if (tag.StartsWith("Key"))
         {
+            audioSource.PlayOneShot(effectSound);
+
             string key = tag.Replace("Key", ""); // Key1 → 1
             currentNumber += key;
             inputText.text = currentNumber;
@@ -32,6 +43,8 @@ public class KeypadTouchInput : MonoBehaviour
         }
         else if (tag == "CallButton")
         {
+            audioSource.PlayOneShot(effectSound);
+
             Debug.LogError("콜버튼 눌림!");
 
             StartCoroutine(TouchDelay());
@@ -39,6 +52,7 @@ public class KeypadTouchInput : MonoBehaviour
             if (currentNumber == "119")
             {
                 Debug.Log("✅ 119 신고 완료!");
+                audioSource.PlayOneShot(effectSound1);
                 callUIManager.ShowCompleteMessage();
                 gameManager.StartGamePhase();
 

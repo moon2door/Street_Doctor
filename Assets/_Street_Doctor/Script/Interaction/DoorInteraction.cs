@@ -11,8 +11,14 @@ public class DoorInteraction : MonoBehaviour //Door_parent에 들어있는 스크립트. 
     private Quaternion closedRotation;
     private Quaternion openedRotation;
     private bool isMoving = false;
+
+    public AudioClip effectSound;           // 한 번 재생할 사운드 클립
+    private AudioSource audioSource;        // AudioSource 컴포넌트
+
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
+
         closedRotation = transform.rotation;
         openedRotation = Quaternion.Euler(transform.eulerAngles + new Vector3(0, openAngle, 0));
     }
@@ -24,6 +30,8 @@ public class DoorInteraction : MonoBehaviour //Door_parent에 들어있는 스크립트. 
     }
     IEnumerator RotateDoor()
     {
+        audioSource.PlayOneShot(effectSound);
+
         isMoving = true;
         Quaternion targetRotation = isOpen ? closedRotation : openedRotation;
         Quaternion startRotation = transform.rotation;

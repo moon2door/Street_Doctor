@@ -8,6 +8,9 @@ public class Tothelastscene : MonoBehaviour
     private int currentIndex = 0;    // 현재 보여주고 있는 이미지 인덱스
     public bool allImagesShown = false;
 
+    public AudioClip effectSound;           // 한 번 재생할 사운드 클립
+    private AudioSource audioSource;        // AudioSource 컴포넌트
+
     void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -20,6 +23,8 @@ public class Tothelastscene : MonoBehaviour
 
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
+
         // 시작 시 모든 이미지 꺼두기
         if (images != null)
         {
@@ -67,6 +72,8 @@ public class Tothelastscene : MonoBehaviour
     {
         if (currentIndex < images.Length && images[currentIndex] != null)
         {
+            audioSource.PlayOneShot(effectSound);
+
             images[currentIndex].gameObject.SetActive(true);
             currentIndex++;
 

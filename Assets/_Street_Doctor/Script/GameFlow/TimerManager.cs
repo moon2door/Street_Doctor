@@ -11,11 +11,18 @@ public class TimerManager : MonoBehaviour
 
     private bool isStopped = true;   // 타이머 정지 여부
 
+    public AudioClip effectSound;           // 한 번 재생할 사운드 클립
+    private AudioSource audioSource;        // AudioSource 컴포넌트
+
+    private bool hasStartedSound = false;
+
     // 전체 시간을 초 단위로 반환하는 프로퍼티
     public float TotalTimeInSeconds => playTimeMinutes * 60f;
 
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
+
         // 시작하면 타이머를 리셋함
         ResetTimer();
         isStopped = true;
@@ -30,6 +37,15 @@ public class TimerManager : MonoBehaviour
         // 매 프레임 시간 감소
         timer -= Time.deltaTime;
 
+        // 효과음 처음 시작할 때 1번만 루프 재생
+        if (!hasStartedSound)
+        {
+            audioSource.clip = effectSound;
+            audioSource.loop = true;
+            audioSource.Play();
+            hasStartedSound = true;
+        }
+
         // 시간 텍스트 갱신
         timerText.text = $"구급차가 도착하기까지 : {Mathf.Max(timer, 0):F1}초";
 
@@ -38,6 +54,7 @@ public class TimerManager : MonoBehaviour
         {
             // 타임 업 값 true
             isTimeUp = true;
+            audioSource.Stop();
         }
     }
 
@@ -59,5 +76,7 @@ public class TimerManager : MonoBehaviour
         timer = TotalTimeInSeconds;
         isTimeUp = false;
         isStopped = false;
+
+        hasStartedSound = false;
     }
 }

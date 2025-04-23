@@ -33,7 +33,7 @@ public class CallingUIManager : MonoBehaviour
         callCanvas.SetActive(true);
         phoneObject.SetActive(true);
         cprcountImage.gameObject.SetActive(false);
-        guideText.text = "왼손의 휴대폰으로 119에 신고하세요!";
+        guideText.text = "왼손의 휴대폰을 오른손 검지로 터치해서\n119에 신고하세요!";
     }
 
     public void ShowCompleteMessage()
@@ -45,7 +45,7 @@ public class CallingUIManager : MonoBehaviour
 
     public void ShowErrorMessage()
     {
-        guideText.text = "그 번호는 응급번호가 아니에요 ㅠㅠ \n응급번호 : 119";
+        guideText.text = "그 번호가 아니에요 ㅠㅠ \n응급번호 : 119";
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)

@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
 {
     public GaugeManager gaugeManager;
     public TimerManager timerManager;
+    public JawTiltController jawTiltController;
+
     public Text resultText;
     public Text cprCountText;
 
@@ -28,6 +30,7 @@ public class GameManager : MonoBehaviour
 
     public int currentCPRCount = 0;
     public int currentBreathCount = 0;
+    public int currentJawCount = 0;
     public bool isCPRPhase = true; // true: CPR, false: breath
 
     private string triggeredObjectName = null;
@@ -35,6 +38,9 @@ public class GameManager : MonoBehaviour
     public GameObject fail_Image;
     public GameObject cprCanvus;
     public GameObject gaugeCanvus;
+
+    public AudioClip effectSound;           // 한 번 재생할 사운드 클립
+    private AudioSource audioSource;        // AudioSource 컴포넌트
 
     void OnEnable()
     {
@@ -48,7 +54,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -103,7 +109,9 @@ public class GameManager : MonoBehaviour
 
     public void TriggerBreath()
     {
-        if (!isGameStart || isCPRPhase) return;
+        if (!isGameStart || isCPRPhase || !jawTiltController.hasActivated) return;
+
+        audioSource.PlayOneShot(effectSound);
 
         currentBreathCount++;
         UpdateCPRUI();
@@ -124,6 +132,14 @@ public class GameManager : MonoBehaviour
         gaugeManager.MouseTrigger();
     }
 
+    public void Triggerjaw()
+    {
+        if (!isGameStart || isCPRPhase) return;
+
+        currentJawCount++;
+        UpdateCPRUI();
+    }
+
     void UpdateCPRUI()
     {
         if (cprCountText == null) return;
@@ -137,13 +153,20 @@ public class GameManager : MonoBehaviour
                     $"양 손을 모아 가슴의 빨간 큐브를 \n" +
                     $"충분히 눌렀다 떼세요.\n\n" +
                     $"흉부압박 진행중 {currentCPRCount}회 / 30회";
-            else
+
+            else if (!isCPRPhase && jawTiltController.hasActivated)
                 cprCountText.text =
                     $"=  튜토리얼 진행중  =\n" +
                     $"이제 인공호흡을 해야해요!\n" +
                     $"입의 빨간 큐브에 얼굴을 \n" +
                     $"n초이상 가져다 대세요.\n\n" +
                     $"인공호흡 진행중 {currentBreathCount}회 / 2회";
+            else
+                cprCountText.text =
+                    $"=  튜토리얼 진행중  =\n" +
+                    $"이제 인공호흡을 해야해요!\n" +
+                    $"환자의 고개를 젖혀주세요.\n\n" +
+                    $"환자의 고개 젖히기 (최고 1회만 실행) 0 / 1회";
         }
         else if (!tutorial)
         {
@@ -161,7 +184,7 @@ public class GameManager : MonoBehaviour
                     $"인공호흡 진행중 {currentBreathCount}회 / 2회";
         }
 
-        
+
     }
 
     void GameFail()
@@ -290,6 +313,8 @@ public class GameManager : MonoBehaviour
     {
         resultText = GameObject.Find("resultText")?.GetComponent<Text>();
         cprCountText = GameObject.Find("cprCountText")?.GetComponent<Text>();
+
+        jawTiltController = GameObject.Find("Jaw_Control")?.GetComponent<JawTiltController>();
 
         ambulance = GameObject.Find("ambulance");
         pointB = GameObject.Find("pointB")?.transform;
