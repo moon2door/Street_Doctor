@@ -17,6 +17,7 @@ public class RH : MonoBehaviour
     public GaugeManager gaugeManager;   // 게이지 매니저
     public GameManager gameManager;     // 게임 매니저
     public Tothelastscene tothelastscene; // 이미지 재생 후 씬 전환 클래스
+    public Ending_Manager ending_Manager;
 
     private GameObject grabbedObject = null; // 현재 잡은 오브젝트
     private bool doorOpened = false;         // 문이 열렸는지 여부
@@ -67,6 +68,14 @@ public class RH : MonoBehaviour
             if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch))
             {
                 StartCoroutine(WaitAndChangeScene());
+            }
+        }
+
+        if (SceneManager.GetActiveScene().name == "5_CPREnding")
+        {
+            if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch))
+            {
+                ending_Manager.Clicker();
             }
         }
 
@@ -185,6 +194,11 @@ public class RH : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "4_CPR") AssignUIObjects();
+
+        if (scene.name == "5_CPREnding")
+        {
+             ending_Manager = GameObject.Find("Ending_Manager")?.GetComponent<Ending_Manager>();
+        }
     }
 
     // 씬 내에서 UI 오브젝트 찾기

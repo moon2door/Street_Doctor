@@ -22,14 +22,19 @@ public class GameManager : MonoBehaviour
     private bool phone_TF = false;
 
     public bool isGameStart = false;
+    public bool tutorial = true;
     public bool CanNextScene = true;
-    public bool gameClear = false;
+    public bool gameClear = true;
 
     public int currentCPRCount = 0;
     public int currentBreathCount = 0;
     public bool isCPRPhase = true; // true: CPR, false: breath
 
     private string triggeredObjectName = null;
+
+    public GameObject fail_Image;
+    public GameObject cprCanvus;
+    public GameObject gaugeCanvus;
 
     void OnEnable()
     {
@@ -43,7 +48,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        
+
     }
 
     void Update()
@@ -63,13 +68,20 @@ public class GameManager : MonoBehaviour
 
     public void StartGamePhase()
     {
-        isGameStart = true;
-        gaugeManager.ResetGauge();
-        timerManager.ResetTimer();
-        currentCPRCount = 0;
-        currentBreathCount = 0;
-        isCPRPhase = true;
-        UpdateCPRUI();
+        if (tutorial)
+        {
+            isGameStart = true;
+            currentCPRCount = 0;
+            currentBreathCount = 0;
+            isCPRPhase = true;
+            UpdateCPRUI();
+        }
+        else if (!tutorial)
+        {
+            gaugeManager.ResetGauge();
+            timerManager.ResetTimer();
+            UpdateCPRUI();
+        }
     }
 
     public void TriggerCPR()
@@ -101,6 +113,12 @@ public class GameManager : MonoBehaviour
             isCPRPhase = true;
             currentCPRCount = 0;
             UpdateCPRUI();
+
+            if (tutorial)
+            {
+                tutorial = false;
+                StartGamePhase();
+            }
         }
 
         gaugeManager.MouseTrigger();
@@ -110,23 +128,56 @@ public class GameManager : MonoBehaviour
     {
         if (cprCountText == null) return;
 
-        if (isCPRPhase)
-            cprCountText.text = $"심폐소생술을 진행해야 합니다!\n양 손을 모아 가슴의 빨간 큐브를 \n충분히 눌렀다 떼세요.\n\n흉부압박 진행중 {currentCPRCount}회 / 30회";
-        else
-            cprCountText.text = $"이제 인공호흡을 해야해요!\n입의 빨간 큐브에 얼굴을 \nn초이상 가져다 대세요.\n\n인공호흡 진행중 {currentBreathCount}회 / 2회";
+        if (tutorial)
+        {
+            if (isCPRPhase)
+                cprCountText.text =
+                    $"=  튜토리얼 진행중  =\n" +
+                    $"심폐소생술을 진행해야 합니다!\n" +
+                    $"양 손을 모아 가슴의 빨간 큐브를 \n" +
+                    $"충분히 눌렀다 떼세요.\n\n" +
+                    $"흉부압박 진행중 {currentCPRCount}회 / 30회";
+            else
+                cprCountText.text =
+                    $"=  튜토리얼 진행중  =\n" +
+                    $"이제 인공호흡을 해야해요!\n" +
+                    $"입의 빨간 큐브에 얼굴을 \n" +
+                    $"n초이상 가져다 대세요.\n\n" +
+                    $"인공호흡 진행중 {currentBreathCount}회 / 2회";
+        }
+        else if (!tutorial)
+        {
+            if (isCPRPhase)
+                cprCountText.text =
+                    $"심폐소생술을 진행해야 합니다!\n" +
+                    $"양 손을 모아 가슴의 빨간 큐브를 \n" +
+                    $"충분히 눌렀다 떼세요.\n\n" +
+                    $"흉부압박 진행중 {currentCPRCount}회 / 30회";
+            else
+                cprCountText.text =
+                    $"이제 인공호흡을 해야해요!\n" +
+                    $"입의 빨간 큐브에 얼굴을 \n" +
+                    $"n초이상 가져다 대세요.\n\n" +
+                    $"인공호흡 진행중 {currentBreathCount}회 / 2회";
+        }
+
+        
     }
 
     void GameFail()
     {
         isGameOver = true;
+        gameClear = false;
         resultText.text = "실패!";
         gaugeManager.StopGauge();
         timerManager.StopTimer();
+        StartCoroutine(WaitAndChangeScene());
     }
 
     IEnumerator HandleSuccessSequence()
     {
         isGameOver = true;
+        gameClear = true;
 
         gaugeManager.StopGauge();
         timerManager.StopTimer();
@@ -155,6 +206,8 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator FadeToBlack()
     {
+        if (SceneManager.GetActiveScene().name == "5_CPREnding") yield break;
+
         float fadeDuration = 2f;
         float elapsed = 0f;
         Image targetImage = SceneManager.GetActiveScene().name == "3_Cut" ? newFadeImage : fadeImage;
@@ -242,6 +295,9 @@ public class GameManager : MonoBehaviour
         pointB = GameObject.Find("pointB")?.transform;
         pointC = GameObject.Find("pointC")?.transform;
         fadeImage = GameObject.Find("FadeOut_Image")?.GetComponent<Image>();
+        fail_Image = GameObject.Find("Failed__00000");
+        cprCanvus = GameObject.Find("CPR Canvus");
+        gaugeCanvus = GameObject.Find("Gauge Canvas");
 
         var gaugeManagerObj = GameObject.Find("GaugeManager");
         if (gaugeManagerObj != null)
@@ -268,6 +324,7 @@ public class GameManager : MonoBehaviour
         }
 
         ambulance.SetActive(false);
+        fail_Image.SetActive(false);
     }
 
     void AssignUIObjects_01()
@@ -292,11 +349,16 @@ public class GameManager : MonoBehaviour
             if (gameClear)
             {
                 DontDestroy.nextSceneName = "5_CPREnding";
+                Debug.LogError("5씬 열림");
             }
             else if (!gameClear)
             {
                 gameClear = true;
                 DontDestroy.nextSceneName = "1_Start";
+                gaugeCanvus.SetActive(false);
+                cprCanvus.SetActive(false);
+                fail_Image.SetActive(true);
+                Debug.LogError("1씬 열림");
             }
         }
         else if (currentScene == "5_CPREnding")

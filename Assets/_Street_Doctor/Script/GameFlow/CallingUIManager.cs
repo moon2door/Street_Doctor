@@ -40,8 +40,6 @@ public class CallingUIManager : MonoBehaviour
     {
         guideText.text = "신고가 완료되었습니다! \n이제 환자를 구출하러 가요!";
         phoneObject.SetActive(false);
-        callCanvas.SetActive(false);
-        cprcountImage.gameObject.SetActive(true);
         StartCoroutine(DeleteMessage());    
     }
 
@@ -64,7 +62,8 @@ public class CallingUIManager : MonoBehaviour
     IEnumerator DeleteMessage()
     {
         yield return new WaitForSeconds(3f);
-
+        callCanvas.SetActive(false);
         guideText.gameObject.SetActive(false);
+        cprcountImage.gameObject.SetActive(true);
     }
 }
