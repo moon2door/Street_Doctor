@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Street_Doctor/Scene/5_CPREnding.unity
     guid: 7390f680160d63d4895aeed91c188519
+  - enabled: 1
+    path: Assets/_Street_Doctor/Scene/________OBJ.unity
+    guid: b509457eb38b5064f8268a055d27019c
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 82a83635ab48d694bac61acb9ed8c3fa,
       type: 2}
