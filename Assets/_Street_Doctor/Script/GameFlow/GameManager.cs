@@ -292,6 +292,8 @@ public class GameManager : MonoBehaviour
             isGameStart = true;
             phoneObj.SetActive(true);
             phone_TF = true;
+
+            tutorial = !SkipFlags.cprTutorialSkipped; //  Ãß°¡
         }
         else if (scene.name == "3_Cut")
         {
