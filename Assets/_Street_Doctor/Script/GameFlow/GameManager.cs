@@ -9,13 +9,19 @@ public class GameManager : MonoBehaviour
     public TimerManager timerManager;
     public JawTiltController jawTiltController;
 
-    public Text resultText;
+
     public Text cprCountText;
 
     public GameObject ambulance;
     public GameObject phoneObj;
+    public GameObject fingerRhand;
+
+    public Transform start_Point;
+    public Transform pointA;
     public Transform pointB;
     public Transform pointC;
+    public Transform pointD;
+    public Transform end_Point;
 
     public Image fadeImage;
     public Image newFadeImage;
@@ -40,6 +46,7 @@ public class GameManager : MonoBehaviour
     public GameObject gaugeCanvus;
 
     public AudioClip effectSound;           // 한 번 재생할 사운드 클립
+    public AudioClip cprSound;           // 한 번 재생할 사운드 클립
     private AudioSource audioSource;        // AudioSource 컴포넌트
 
     void OnEnable()
@@ -94,11 +101,14 @@ public class GameManager : MonoBehaviour
     {
         if (!isGameStart || !isCPRPhase) return;
 
+        audioSource.PlayOneShot(cprSound);
         currentCPRCount++;
         UpdateCPRUI();
 
-        if (currentCPRCount >= 30)
+        if (currentCPRCount >= 60)
         {
+            audioSource.PlayOneShot(effectSound);
+
             isCPRPhase = false;
             currentBreathCount = 0;
             UpdateCPRUI();
@@ -135,9 +145,10 @@ public class GameManager : MonoBehaviour
     public void Triggerjaw()
     {
         if (!isGameStart || isCPRPhase) return;
-
+        
         currentJawCount++;
         UpdateCPRUI();
+        audioSource.PlayOneShot(effectSound);
     }
 
     void UpdateCPRUI()
@@ -148,39 +159,22 @@ public class GameManager : MonoBehaviour
         {
             if (isCPRPhase)
                 cprCountText.text =
-                    $"=  튜토리얼 진행중  =\n" +
-                    $"심폐소생술을 진행해야 합니다!\n" +
-                    $"양 손을 모아 가슴의 빨간 큐브를 \n" +
-                    $"충분히 눌렀다 떼세요.\n\n" +
-                    $"흉부압박 진행중 {currentCPRCount}회 / 30회";
+                    $"흉부압박 진행중 {currentCPRCount}회 / 60회";
 
             else if (!isCPRPhase && jawTiltController.hasActivated)
                 cprCountText.text =
-                    $"=  튜토리얼 진행중  =\n" +
-                    $"이제 인공호흡을 해야해요!\n" +
-                    $"입의 빨간 큐브에 얼굴을 \n" +
-                    $"n초이상 가져다 대세요.\n\n" +
                     $"인공호흡 진행중 {currentBreathCount}회 / 2회";
             else
                 cprCountText.text =
-                    $"=  튜토리얼 진행중  =\n" +
-                    $"이제 인공호흡을 해야해요!\n" +
-                    $"환자의 고개를 젖혀주세요.\n\n" +
                     $"환자의 고개 젖히기 (최고 1회만 실행) 0 / 1회";
         }
         else if (!tutorial)
         {
             if (isCPRPhase)
                 cprCountText.text =
-                    $"심폐소생술을 진행해야 합니다!\n" +
-                    $"양 손을 모아 가슴의 빨간 큐브를 \n" +
-                    $"충분히 눌렀다 떼세요.\n\n" +
-                    $"흉부압박 진행중 {currentCPRCount}회 / 30회";
+                    $"흉부압박 진행중 {currentCPRCount}회 / 60회";
             else
                 cprCountText.text =
-                    $"이제 인공호흡을 해야해요!\n" +
-                    $"입의 빨간 큐브에 얼굴을 \n" +
-                    $"n초이상 가져다 대세요.\n\n" +
                     $"인공호흡 진행중 {currentBreathCount}회 / 2회";
         }
 
@@ -191,7 +185,7 @@ public class GameManager : MonoBehaviour
     {
         isGameOver = true;
         gameClear = false;
-        resultText.text = "실패!";
+        fail_Image.SetActive(true);
         gaugeManager.StopGauge();
         timerManager.StopTimer();
         StartCoroutine(WaitAndChangeScene());
@@ -206,19 +200,58 @@ public class GameManager : MonoBehaviour
         timerManager.StopTimer();
 
         ambulance.SetActive(true);
-        ambulance.transform.position = pointB.position;
+        ambulance.transform.position = start_Point.position;
 
-        float duration = 3f;
-        float elapsed = 0f;
+        // 포인트 배열과 회전값 설정
+        Transform[] points = new Transform[] { pointA, pointB, pointC, pointD, end_Point };
+        float[] rotations = new float[] { 90f, 180f, 270f, 180f };
 
-        while (elapsed < duration)
+        // 총 이동에 걸리는 시간
+        float totalDuration = 5f; // (원하는 값으로 설정)
+
+        // 거리 계산
+        float[] distances = new float[points.Length];
+        float totalDistance = 0f;
+
+        Vector3 previousPos =  start_Point.position;
+
+        for (int i = 0; i < points.Length; i++)
         {
-            ambulance.transform.position = Vector3.Lerp(pointB.position, pointC.position, elapsed / duration);
-            elapsed += Time.deltaTime;
-            yield return null;
+            distances[i] = Vector3.Distance(previousPos, points[i].position);
+            totalDistance += distances[i];
+            previousPos = points[i].position;
         }
 
-        ambulance.transform.position = pointC.position;
+        // 이동 시작
+        previousPos = start_Point.position;
+        for (int i = 0; i < points.Length; i++)
+        {
+            Vector3 startPos = previousPos;
+            Vector3 endPos = points[i].position;
+
+            float moveDuration = totalDuration * (distances[i] / totalDistance); // 거리비율만큼 시간 할당
+            float elapsed = 0f;
+
+            while (elapsed < moveDuration)
+            {
+                ambulance.transform.position = Vector3.Lerp(startPos, endPos, elapsed / moveDuration);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            ambulance.transform.position = endPos;
+
+            // 회전값 변경 (B~E 지점 도착 시)
+            if (i < rotations.Length)
+            {
+                Vector3 currentEulerAngles = ambulance.transform.eulerAngles;
+                currentEulerAngles.y = rotations[i];
+                ambulance.transform.eulerAngles = currentEulerAngles;
+            }
+
+            previousPos = endPos;
+        }
+
 
         CanNextScene = true;
 
@@ -266,7 +299,7 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         isGameOver = false;
-        resultText.text = "";
+        fail_Image.SetActive(false);
 
         if (fadeImage != null)
         {
@@ -291,9 +324,8 @@ public class GameManager : MonoBehaviour
             AssignUIObjects();
             isGameStart = true;
             phoneObj.SetActive(true);
+            fingerRhand.SetActive(true);
             phone_TF = true;
-
-            tutorial = !SkipFlags.cprTutorialSkipped; //  추가
         }
         else if (scene.name == "3_Cut")
         {
@@ -302,25 +334,32 @@ public class GameManager : MonoBehaviour
             phone_TF = false;
 
             phoneObj.SetActive(false);
+            fingerRhand.SetActive(false);
         }
         else
         {
             phone_TF = false;
 
             phoneObj.SetActive(false);
+            fingerRhand.SetActive(false);
         }
     }
 
     void AssignUIObjects()
     {
-        resultText = GameObject.Find("resultText")?.GetComponent<Text>();
         cprCountText = GameObject.Find("cprCountText")?.GetComponent<Text>();
 
         jawTiltController = GameObject.Find("Jaw_Control")?.GetComponent<JawTiltController>();
 
         ambulance = GameObject.Find("ambulance");
-        pointB = GameObject.Find("pointB")?.transform;
-        pointC = GameObject.Find("pointC")?.transform;
+
+        start_Point = GameObject.Find("Start Point")?.transform;
+        end_Point = GameObject.Find("End Point")?.transform;
+        pointA = GameObject.Find("Point A")?.transform;
+        pointB = GameObject.Find("Point B")?.transform;
+        pointC = GameObject.Find("Point C")?.transform;
+        pointD = GameObject.Find("Point D")?.transform;
+
         fadeImage = GameObject.Find("FadeOut_Image")?.GetComponent<Image>();
         fail_Image = GameObject.Find("Failed__00000");
         cprCanvus = GameObject.Find("CPR Canvus");

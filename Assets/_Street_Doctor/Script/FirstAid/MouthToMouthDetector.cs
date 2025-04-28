@@ -13,8 +13,13 @@ public class MouthToMouthDetector : MonoBehaviour
     private bool isInZone = false;
     private float cooldownTimer = 0f;
 
+    public AudioClip kissSound;
+    private AudioSource audioSource;        // AudioSource 컴포넌트
+
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
+
         if (centerEyeAnchor == null)
         {
             GameObject eye = GameObject.Find("CenterEyeAnchor");
@@ -54,9 +59,16 @@ public class MouthToMouthDetector : MonoBehaviour
                 timer = 0f;
 
                 Debug.Log("[MouthToMouth] 머리 위치 인식 시작");
+
+                if (!gameManager.isCPRPhase)
+                {
+                    audioSource.PlayOneShot(kissSound);
+                }
             }
 
             timer += Time.deltaTime;
+            
+            
 
             if (timer >= requiredTime)
             {

@@ -8,10 +8,14 @@ public class CallingUIManager : MonoBehaviour
     public GameObject callCanvas;
     public Text guideText;
     public GameObject phoneObject;
+    public GameObject R_F_H;
+    public GameObject R_H;
 
     public Image cprcountImage;
 
     public KeypadTouchInput keypadTouchInput;
+
+    public GameObject gaugeCanvas;
 
     void OnEnable()
     {
@@ -25,6 +29,7 @@ public class CallingUIManager : MonoBehaviour
 
     private void Start()
     {
+        gaugeCanvas.SetActive(false);
         ShowCallUI();
     }
 
@@ -32,13 +37,17 @@ public class CallingUIManager : MonoBehaviour
     {
         callCanvas.SetActive(true);
         phoneObject.SetActive(true);
+        R_F_H.SetActive(true);
+        R_H.SetActive(false);
         cprcountImage.gameObject.SetActive(false);
-        guideText.text = "왼손의 휴대폰을 오른손 검지로 터치해서\n119에 신고하세요!";
+        guideText.text = "왼손의 휴대폰을 오른손 검지로 직접 터치해서\n119에 신고하세요!";
     }
 
     public void ShowCompleteMessage()
     {
         guideText.text = "신고가 완료되었습니다! \n이제 환자를 구출하러 가요!";
+        R_F_H.SetActive(false);
+        R_H.SetActive(true);
         phoneObject.SetActive(false);
         StartCoroutine(DeleteMessage());    
     }
@@ -56,6 +65,8 @@ public class CallingUIManager : MonoBehaviour
     void AssignUIObjects()
     {
         phoneObject = GameObject.Find("Phone");
+        R_F_H = GameObject.Find("fin)Hand_R_____________________");
+        R_H = GameObject.Find("Player_R____");
         keypadTouchInput = GameObject.Find("FingerTip_R ")?.GetComponent<KeypadTouchInput>();   
     }
 

@@ -25,6 +25,18 @@ public class KeypadTouchInput : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
+    private void Update()
+    {
+        if (callUIManager == null)
+        {
+            AssignUIObjects();
+        }
+        else
+        {
+            return;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (!canTouch) return;
@@ -98,6 +110,8 @@ public class KeypadTouchInput : MonoBehaviour
 
     void AssignUIObjects()
     {
+        Debug.Log("실행중");
+
         var callUIManagerObj = GameObject.Find("Calling_Image");
         if (callUIManagerObj != null)
         {
