@@ -81,20 +81,13 @@ public class GameManager : MonoBehaviour
 
     public void StartGamePhase()
     {
-        if (tutorial)
-        {
-            isGameStart = true;
-            currentCPRCount = 0;
-            currentBreathCount = 0;
-            isCPRPhase = true;
-            UpdateCPRUI();
-        }
-        else if (!tutorial)
-        {
-            gaugeManager.ResetGauge();
-            timerManager.ResetTimer();
-            UpdateCPRUI();
-        }
+        isGameStart = true;
+        currentCPRCount = 0;
+        currentBreathCount = 0;
+        isCPRPhase = true;
+        gaugeManager.ResetGauge();
+        timerManager.ResetTimer();
+        UpdateCPRUI();
     }
 
     public void TriggerCPR()
@@ -131,12 +124,6 @@ public class GameManager : MonoBehaviour
             isCPRPhase = true;
             currentCPRCount = 0;
             UpdateCPRUI();
-
-            if (tutorial)
-            {
-                tutorial = false;
-                StartGamePhase();
-            }
         }
 
         gaugeManager.MouseTrigger();
@@ -173,9 +160,13 @@ public class GameManager : MonoBehaviour
             if (isCPRPhase)
                 cprCountText.text =
                     $"흉부압박 진행중 {currentCPRCount}회 / 60회";
-            else
+            else if (!isCPRPhase && jawTiltController.hasActivated)
                 cprCountText.text =
                     $"인공호흡 진행중 {currentBreathCount}회 / 2회";
+
+            else
+                cprCountText.text =
+                    $"환자의 고개 젖히기 (최고 1회만 실행) 0 / 1회";
         }
 
 
@@ -262,6 +253,14 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator FadeToBlack()
     {
+        if (SceneManager.GetActiveScene().name == "4_CPR")
+        {
+            if (!gameClear)
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+
         if (SceneManager.GetActiveScene().name == "5_CPREnding") yield break;
 
         float fadeDuration = 2f;

@@ -29,7 +29,6 @@ public class CallingUIManager : MonoBehaviour
 
     private void Start()
     {
-        gaugeCanvas.SetActive(false);
         ShowCallUI();
     }
 
@@ -39,6 +38,7 @@ public class CallingUIManager : MonoBehaviour
         phoneObject.SetActive(true);
         R_F_H.SetActive(true);
         R_H.SetActive(false);
+        gaugeCanvas.SetActive(false);
         cprcountImage.gameObject.SetActive(false);
         guideText.text = "왼손의 휴대폰을 오른손 검지로 직접 터치해서\n119에 신고하세요!";
     }

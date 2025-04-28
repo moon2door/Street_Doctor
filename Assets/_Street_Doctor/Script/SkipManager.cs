@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class SkipManager : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class SkipManager : MonoBehaviour
     public float holdThreshold = 2f;     // 2초 이상이면 전체 스킵
 
     private GameManager gameManager; // 내부에서 런타임에 찾을 GameManager
+    public GaugeManager gaugeManager;
+    public CallingUIManager callingUIManager;
+    public Text cprCountText;
 
     void Start()
     {
@@ -19,10 +23,6 @@ public class SkipManager : MonoBehaviour
 
         // ✅ 런타임에 GameManager 자동 찾기
         gameManager = FindObjectOfType<GameManager>();
-        if (gameManager == null)
-        {
-            Debug.LogWarning("[SkipManager] GameManager를 찾을 수 없습니다.");
-        }
     }
     void Update()
     {
@@ -79,12 +79,14 @@ public class SkipManager : MonoBehaviour
         {
             Debug.Log("튜토리얼 끝");
 
-            if (SceneManager.GetActiveScene().name == "4_CPR")
+            if (SceneManager.GetActiveScene().name == "4_CPR" && gameManager != null)
             {
-                // 체력바 활성화
-                // cpr 횟수 활성화
-                // 튜토리얼 off 
-                // 게임스타트 실행
+                // 여기서 본게임 시작
+                gaugeManager.gameObject.SetActive(true);     // 체력바 캔버스
+                cprCountText.gameObject.SetActive(true);     // CPR 카운트 텍스트
+                gameManager.tutorial = false;                // 튜토리얼 플래그 OFF
+                callingUIManager.gaugeCanvas.SetActive(true);
+                gameManager.StartGamePhase();                // 본게임 시작
             }
         }
     }
@@ -97,25 +99,17 @@ public class SkipManager : MonoBehaviour
             if (canvas != null)
                 canvas.SetActive(false);
         }
-        Debug.Log($"[SkipManager] 현재 씬 이름: {SceneManager.GetActiveScene().name}");
 
-        //  CPR 튜토리얼인 경우 GameManager에 반영
         if (SceneManager.GetActiveScene().name == "4_CPR" && gameManager != null)
         {
-            Debug.Log("[SkipManager] 4_CPR에서 tutorial 모드 강제 종료 시도");
-
             if (gameManager.tutorial)
             {
-                gameManager.tutorial = false;              //  튜토리얼 비활성화
-                gameManager.currentCPRCount = 0;           //  카운트 리셋
-                gameManager.currentBreathCount = 0;
-                gameManager.StartGamePhase();              //  일반 CPR 루틴 시작
-                Debug.Log("[SkipManager] CPR 튜토리얼 강제 종료");
+                gaugeManager.gameObject.SetActive(true);
+                cprCountText.gameObject.SetActive(true);
+                gameManager.tutorial = false;
+                callingUIManager.gaugeCanvas.SetActive(true);
+                gameManager.StartGamePhase();
             }
-        }
-        else
-        {
-            Debug.LogWarning("[SkipManager] 조건 불충족: 4_CPR + tutorial == true가 아님");
         }
     }
 }

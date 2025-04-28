@@ -66,8 +66,6 @@ public class KeypadTouchInput : MonoBehaviour
                 Debug.Log("✅ 119 신고 완료!");
                 audioSource.PlayOneShot(effectSound1);
                 callUIManager.ShowCompleteMessage();
-                gameManager.StartGamePhase();
-
             }
             else
             {
