@@ -2090,6 +2090,9 @@ MonoBehaviour:
   - {fileID: 54832384}
   - {fileID: 489831994}
   holdThreshold: 2
+  gaugeManager: {fileID: 0}
+  callingUIManager: {fileID: 0}
+  cprCountText: {fileID: 0}
 --- !u!4 &629416773
 Transform:
   m_ObjectHideFlags: 0
