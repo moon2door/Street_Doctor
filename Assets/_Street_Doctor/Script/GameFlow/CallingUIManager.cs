@@ -40,7 +40,7 @@ public class CallingUIManager : MonoBehaviour
         R_H.SetActive(false);
         gaugeCanvas.SetActive(false);
         cprcountImage.gameObject.SetActive(false);
-        guideText.text = "왼손의 휴대폰을 오른손 검지로 직접 터치해서\n119에 신고하세요!";
+        guideText.text = "왼손의 휴대폰을 오른손 검지로\n직접 터치해서\n119에 신고하세요!";
     }
 
     public void ShowCompleteMessage()

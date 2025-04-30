@@ -74,6 +74,18 @@ public class KeypadTouchInput : MonoBehaviour
                 StartCoroutine(BlinkText());
             }
         }
+        else if (tag == "DelButton")
+        {
+            if (!string.IsNullOrEmpty(currentNumber))
+            {
+                // 마지막 글자 하나 제거
+                currentNumber = currentNumber.Substring(0, currentNumber.Length - 1);
+                inputText.text = currentNumber;
+                audioSource.PlayOneShot(effectSound);  // 키 누르는 소리
+                Debug.Log($"🧹 삭제 후 번호: {currentNumber}");
+                StartCoroutine(TouchDelay());
+            }
+        }
         else
         {
             Debug.LogError("아무것도 입력안됨!");
